@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContentsModule } from './modules/contents/contents.module';
-import {CsvModule} from "./modules/csv/csv.module";
+import { ProductsModule } from './modules/products/products.module';
+import { CsvModule} from "./modules/csv/csv.module";
 
 @Module({
     imports: [
@@ -16,8 +17,9 @@ import {CsvModule} from "./modules/csv/csv.module";
             synchronize: true, // 개발 환경에서만 true (프로덕션 환경에서는 false)
             logging: true,
         }),
-        ContentsModule,
         CsvModule,
+        ContentsModule,
+        ProductsModule,
     ],
 })
 export class AppModule {}
