@@ -2,16 +2,23 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as csvParser from 'csv-parser';
 import * as path from 'path';
-import { ContentCategory} from "../contents/content.entity";
+import { ContentCategory } from '../contents/content.entity';
+import { ProductCategory } from '../products/products.entity';
 
 @Injectable()
 export class CsvService {
-    async readCsv(): Promise<any[]> {
-        // 프로젝트 루트 기준으로 data 폴더 위치 설정
-        const baseDir = process.env.NODE_ENV === 'production' ? 'dist' : 'src';
-        const filePath = path.join(process.cwd(), baseDir, 'data', 'content.csv');
+    async readContentCsv(): Promise<any[]> {
+        return this.readCsvFile('content.csv', this.formatContentData.bind(this));
+    }
 
-        // 파일 존재 여부 체크
+    async readProductCsv(): Promise<any[]> {
+        return this.readCsvFile('product.csv', this.formatProductData.bind(this));
+    }
+
+    private async readCsvFile(filename: string, formatter: (data: any) => any): Promise<any[]> {
+        const baseDir = process.env.NODE_ENV === 'production' ? 'dist' : 'src';
+        const filePath = path.join(process.cwd(), baseDir, 'data', filename);
+
         if (!fs.existsSync(filePath)) {
             throw new Error(`CSV 파일이 존재하지 않습니다: ${filePath}`);
         }
@@ -22,33 +29,57 @@ export class CsvService {
             fs.createReadStream(filePath)
                 .pipe(csvParser())
                 .on('data', (data) => {
-                    const formattedData = {
-                        postNumber: Number(data['게시물 번호']?.trim()),
-                        title: data['제목']?.trim() || '',
-                        url: data['URL']?.trim() || '',
-                        author: data['작성자']?.trim() || '',
-                        authorId: data['작성자 ID']?.trim() || '',
-                        createdAt: data['작성시각'] ? new Date(data['작성시각']) : null,
-                        views: Number(data['조회수']) || 0,
-                        likes: Number(data['좋아요']) || 0,
-                        category: this.mapCategory(data['카테고리']) || ContentCategory.ALL,
-                        location: this.formatLocation(data['위치']),
-                    };
-
-                    results.push(formattedData);
+                    const formattedData = this.normalizeCsvKeys(data);
+                    results.push(formatter(formattedData));
                 })
                 .on('end', () => {
-                    results.forEach((item, index) => {
-                        item.id = index +1;
-                    })
-                    console.log(`✅ CSV 파일에서 읽은 총 데이터 개수: ${results.length}`);
+                    console.log(`${filename}에서 불러온 데이터 개수: ${results.length}`);
                     resolve(results);
                 })
                 .on('error', (err) => reject(err));
         });
     }
 
-    private mapCategory(category: string | undefined): ContentCategory {
+    private normalizeCsvKeys(data: any): any {
+        const normalizedData: any = {};
+        Object.keys(data).forEach((key) => {
+            const cleanKey = key.replace(/\ufeff/g, '').trim();
+            normalizedData[cleanKey] = data[key];
+        });
+        return normalizedData;
+    }
+
+    private formatContentData(data: any) {
+        return {
+            postNumber: Number(data['게시물 번호']?.trim()),
+            title: data['제목']?.trim() || '',
+            url: data['URL']?.trim() || '',
+            author: data['작성자']?.trim() || '',
+            authorId: data['작성자 ID']?.trim() || '',
+            createdAt: data['작성시각'] ? new Date(data['작성시각']) : null,
+            views: Number(data['조회수']) || 0,
+            likes: Number(data['좋아요']) || 0,
+            category: this.mapContentCategory(data['카테고리']) || ContentCategory.ALL,
+            location: this.formatLocation(data['위치']),
+        };
+    }
+
+    private formatProductData(data: any) {
+        return {
+            name: data['서비스명']?.trim() || null,
+            category: this.mapProductCategory(data['카테고리']),
+            price: data['서비스가']?.trim() || null,
+            company: data['회사명']?.trim() || null,
+            contactPerson: data['담당자']?.trim() || null,
+            position: data['직책']?.trim() || null,
+            phone: data['전화번호']?.trim() || null,
+            email: data['이메일']?.trim() || null,
+            contactDate: this.formatDate(data['최종 컨택일']),
+            website: data['회사홈페이지']?.trim() || null,
+        };
+    }
+
+    private mapContentCategory(category: string | undefined): ContentCategory {
         if (!category) {
             throw new Error('카테고리 값이 비어 있습니다.');
         }
@@ -62,6 +93,16 @@ export class CsvService {
         return upperCategory as ContentCategory;
     }
 
+    private mapProductCategory(category: string | undefined): ProductCategory {
+        if (!category || category.trim() === '') return ProductCategory.ALL;
+
+        const upperCategory = category.trim();
+
+        if (!Object.values(ProductCategory).includes(upperCategory as ProductCategory)) {
+            throw new Error(`잘못된 카테고리 값: ${upperCategory}`);
+        }
+        return upperCategory as ProductCategory;
+    }
 
     private formatLocation(location: string | undefined): string | null {
         if (!location || location.trim() === '{}' || location.trim() === '') return null;
@@ -75,5 +116,8 @@ export class CsvService {
             .join(', ');
     }
 
-
+    private formatDate(dateString: string | undefined): Date | null {
+        if (!dateString || dateString.trim() === '') return null;
+        return new Date(dateString.trim());
+    }
 }
