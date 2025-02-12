@@ -3,13 +3,13 @@ version: '3.8'
 services:
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: nest-backend
     ports:
       - "3000:3000"
     volumes:
-      - .:/app
+      - ./backend:/app
       - /app/node_modules
     env_file:
       - .env
