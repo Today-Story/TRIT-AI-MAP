@@ -8,10 +8,10 @@ async function bootstrap() {
 
   //swagger 설정
   const config = new DocumentBuilder()
-      .setTitle('상품 API 문서')
-      .setDescription('상품(Product) 관련 API 문서')
+      .setTitle('TRIT-AI-MAP API 문서')
+      .setDescription('TRIT-AI-MAP API 문서')
       .setVersion('1.0')
-      .addTag('products')
+      .addTag('TRIT-AI-MAP')
       .build();
 
   const document = SwaggerModule.createDocument(app, config);

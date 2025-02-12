@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, BadRequestException } from '@nestjs/common';
 import { ProductsService } from "./products.service";
 import { Product } from "./products.entity";
 import { ProductCategory } from "./products.entity";
@@ -26,11 +26,13 @@ export class ProductsController {
     @ApiQuery({
         name: 'name',
         required: true,
-        description: '검색할 상품 키워드 (예: "뷰티", "서울", "음식")'
+        description: '검색할 상품 키워드 (예: "서울", "음식")',
+        example: '서울',
     })
     @ApiResponse({ status: 200, description: '검색된 상품 리스트 반환', type: [Product] })
     async searchProducts(@Query('name') name: string): Promise<Product[]> {
-        return this.productsService.searchByName(name);
+        const decodedName = decodeURIComponent(name);
+        return this.productsService.searchByName(decodedName);
     }
 
     // 특정 상품 조회
@@ -45,9 +47,17 @@ export class ProductsController {
     // 카테고리별 상품 조회
     @Get('category/:category')
     @ApiOperation({ summary: '카테고리별 상품 조회', description: '특정 카테고리의 상품을 조회합니다.' })
-    @ApiParam({ name: 'category', enum: ProductCategory, description: '상품 카테고리' })
+    @ApiParam({
+        name: 'category',
+        enum: ProductCategory,
+        enumName: 'ProductCategory',
+        description: '상품 카테고리 ',
+    })
     @ApiResponse({ status: 200, description: '해당 카테고리의 상품 리스트 반환', type: [Product] })
-    async getProductsByCategory(@Param('category') category: string): Promise<Product[]> {
+    async getProductsByCategory(@Param('category') category: ProductCategory): Promise<Product[]> {
+        if (!Object.values(ProductCategory).includes(category)) {
+            throw new BadRequestException(`잘못된 카테고리 값: ${category}`);
+        }
         return this.productsService.findByCategory(category);
     }
 }

@@ -54,16 +54,24 @@ export class ProductsService {
 
     //카테고리 별 조회
     async findByCategory(category: string): Promise<Product[]> {
+        if (category === '전체' || category.toUpperCase() === 'ALL') {
+            // '전체' 또는 'ALL' 입력 시 모든 데이터 반환
+            return await this.productRepository.find();
+        }
 
-        const categoryEnum = Object.values(ProductCategory).find(cat => cat === category) as ProductCategory;
+        const decodedCategory = decodeURIComponent(category); // 한글 URL 복원
+
+        const categoryEnum = Object.values(ProductCategory).find(cat => cat === decodedCategory) as ProductCategory;
 
         if (!categoryEnum) {
-            throw new Error(`잘못된 카테고리 값: ${category}`);
+            throw new Error(`잘못된 카테고리 값: ${decodedCategory}`);
         }
+
         return await this.productRepository.find({
             where: { category: categoryEnum },
         });
     }
+
 
     //상품 별 조회
     async searchByName(name: string): Promise<Product[]> {
