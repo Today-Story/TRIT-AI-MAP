@@ -42,7 +42,6 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
-./node_modules
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
@@ -80,7 +79,7 @@ web_modules/
 .env.test.local
 .env.production.local
 .env.local
-/.env
+
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -93,7 +92,10 @@ out
 # Nuxt.js build / generate output
 .nuxt
 dist
-/dist
+./backend/dist
+./backend/node_modules
+./backend/src/data
+
 # Gatsby files
 .cache/
 # Comment in the public line in if your project uses Gatsby and not Next.js
@@ -160,6 +162,7 @@ yarn-error.log*
 
 # local env files
 .env*.local
+
 # vercel
 .vercel
 
@@ -167,7 +170,20 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# CSV 데이터 파일 제외
-/data/*.csv
-/src/data/*.csv
-/dist/data/*.csv
+# Docker 관련
+docker-compose.override.yml
+backend/.env
+
+# PostgreSQL 데이터 디렉토리 (로컬 개발용 DB 데이터 무시)
+postgres-data/
+
+# NestJS 빌드 관련
+backend/.nestjs_cache/
+backend/dist/
+
+# Jest 테스트 결과
+backend/junit.xml
+backend/test-results/
+
+# VSCode 설정
+.vscode/
