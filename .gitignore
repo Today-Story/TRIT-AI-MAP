@@ -95,6 +95,10 @@ dist
 ./backend/dist
 ./backend/node_modules
 ./backend/src/data
+backend/src/data/
+backend/src/data/*
+backend/src/data/**/*
+
 
 # Gatsby files
 .cache/
@@ -187,3 +191,4 @@ backend/test-results/
 
 # VSCode 설정
 .vscode/
+
