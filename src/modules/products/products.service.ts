@@ -41,4 +41,35 @@ export class ProductsService {
         }
     }
 
+
+    //전체 상품 조회
+    async findAll(): Promise<Product[]> {
+        return await this.productRepository.find();
+    }
+
+    //ID로 조회
+    async findById(id: number): Promise<Product | null> {
+        return await this.productRepository.findOne({where: {id}});
+    }
+
+    //카테고리 별 조회
+    async findByCategory(category: string): Promise<Product[]> {
+
+        const categoryEnum = Object.values(ProductCategory).find(cat => cat === category) as ProductCategory;
+
+        if (!categoryEnum) {
+            throw new Error(`잘못된 카테고리 값: ${category}`);
+        }
+        return await this.productRepository.find({
+            where: { category: categoryEnum },
+        });
+    }
+
+    //상품 별 조회
+    async searchByName(name: string): Promise<Product[]> {
+        return await this.productRepository
+            .createQueryBuilder('product')
+            .where('product.name ILIKE :name', { name: `%${name}%`})
+            .getMany();
+    }
 }

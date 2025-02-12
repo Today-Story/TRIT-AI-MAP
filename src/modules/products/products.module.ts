@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {Product} from "./products.entity";
 import {CsvService} from "../csv/csv.service";
 import { CsvModule} from "../csv/csv.module";
+import { ProductsController} from "./products.controller";
 
 
 @Module({
@@ -11,6 +12,7 @@ import { CsvModule} from "../csv/csv.module";
       TypeOrmModule.forFeature([Product]),
       CsvModule,
   ],
+  controllers: [ProductsController],
   providers: [ProductsService, CsvService],
   exports: [TypeOrmModule],
 })
