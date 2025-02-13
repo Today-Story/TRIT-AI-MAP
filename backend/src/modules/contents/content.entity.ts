@@ -7,6 +7,7 @@ export enum ContentCategory {
     FOOD = 'FOOD',
     ALL = 'ALL',
 }
+
 @Entity()
 export class Content {
     @PrimaryGeneratedColumn()
@@ -46,7 +47,9 @@ export class Content {
     @Column({ type: 'text', nullable: true })
     location: string;
 
+    @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+    latitude: number;
 
-
-
+    @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+    longitude: number;
 }

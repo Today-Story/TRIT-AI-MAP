@@ -50,6 +50,8 @@ export class CsvService {
     }
 
     private formatContentData(data: any) {
+        console.log("CSV 데이터:", data); // CSV 데이터를 콘솔에 출력하여 확인
+    
         return {
             postNumber: Number(data['게시물 번호']?.trim()),
             title: data['제목']?.trim() || '',
@@ -61,7 +63,20 @@ export class CsvService {
             likes: Number(data['좋아요']) || 0,
             category: this.mapContentCategory(data['카테고리']) || ContentCategory.ALL,
             location: this.formatLocation(data['위치']),
+            latitude: this.parseLatitudeLongitude(data['위도']),
+            longitude: this.parseLatitudeLongitude(data['경도']),
         };
+    }
+    
+    private parseLatitudeLongitude(value: string | undefined): number | null {
+        console.log("위도/경도 원본 값:", value); // 디버깅 로그 추가
+    
+        if (!value || value.trim() === '') return null;
+        const numValue = Number(value.trim());
+        
+        console.log("변환된 숫자 값:", numValue); // 변환 결과 확인
+    
+        return isNaN(numValue) ? null : numValue;
     }
 
     private formatProductData(data: any) {
