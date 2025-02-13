@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import axios from "axios";
 import ContentCard from "./ContentCard";
-import SearchBar from "./SearchBar"; // ✅ 검색 바 컴포넌트 추가
+import SearchBar from "./SearchBar";
+import CategoryFilter from "./CategoryFilter"; // ✅ 카테고리 필터 추가
 
 // ✅ ContentData 타입 정의
 type ContentData = {
@@ -21,10 +22,10 @@ type ContentData = {
   longitude: string | null;
 };
 
-// 🔥 카테고리별 아이콘 매핑 (public 폴더 내 파일명과 일치)
+// 🔥 카테고리별 아이콘 매핑
 const CATEGORY_ICON_MAP: { [key: string]: string } = {
   "BEAUTY": "/Marker_Beauty.svg",
-  "TRAVEL": "/Marker_Play.svg",
+  "PLAY": "/Marker_Play.svg",
   "SHOPPING": "/Marker_Shopping.svg",
   "FOOD": "/Marker_Tasty.svg",
   "DEFAULT": "/Marker_Shopping.svg",
@@ -42,6 +43,7 @@ const GoogleMapComponent = () => {
   const [selectedContent, setSelectedContent] = useState<ContentData | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<string>("AI 추천");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // ✅ 선택된 카테고리
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -82,7 +84,7 @@ const GoogleMapComponent = () => {
 
   return (
     <div className="relative w-[390px] h-[690px] mx-auto border border-gray-300 rounded-lg overflow-hidden">
-      {/* 🔍 검색 바 (컴포넌트로 분리) */}
+      {/* 🔍 검색 바 */}
       <SearchBar
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -95,6 +97,9 @@ const GoogleMapComponent = () => {
           }
         }}
       />
+
+      {/* 🏷️ 카테고리 필터 */}
+      <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
 
       {/* 🗺 Google Maps */}
       <LoadScript googleMapsApiKey={apiKey}>
@@ -115,9 +120,14 @@ const GoogleMapComponent = () => {
             />
           )}
 
-          {/* 📍 API에서 받은 컨텐츠의 좌표값이 존재하는 경우에만 마커 표시 */}
+          {/* 📍 카테고리 필터링 후 마커 표시 */}
           {contents
-            .filter((content) => content.latitude !== null && content.longitude !== null)
+            .filter(
+              (content) =>
+                content.latitude !== null &&
+                content.longitude !== null &&
+                (selectedCategory === null || content.category.toUpperCase() === selectedCategory)
+            )
             .map((content) => (
               <Marker
                 key={content.id}
