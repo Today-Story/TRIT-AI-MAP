@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import axios from "axios";
 import ContentCard from "./ContentCard";
-import { FiSearch } from "react-icons/fi"; // 🔍 검색 아이콘
-import { IoSettingsOutline } from "react-icons/io5"; // ⚙️ 설정 아이콘
+import SearchBar from "./SearchBar"; // ✅ 검색 바 컴포넌트 추가
 
 // ✅ ContentData 타입 정의
 type ContentData = {
@@ -28,7 +27,7 @@ const CATEGORY_ICON_MAP: { [key: string]: string } = {
   "TRAVEL": "/Marker_Play.svg",
   "SHOPPING": "/Marker_Shopping.svg",
   "FOOD": "/Marker_Tasty.svg",
-  "DEFAULT": "/Marker_Shopping.svg", // 기본 마커
+  "DEFAULT": "/Marker_Shopping.svg",
 };
 
 const containerStyle = {
@@ -83,51 +82,28 @@ const GoogleMapComponent = () => {
 
   return (
     <div className="relative w-[390px] h-[690px] mx-auto border border-gray-300 rounded-lg overflow-hidden">
-      {/* 🔍 검색창 + 필터 UI */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-11/12 flex flex-col gap-2 z-10">
-        {/* 🔍 검색 바 */}
-        <div className="bg-white shadow-md rounded-full flex items-center px-4 py-2 border border-blue-400">
-          <FiSearch className="text-blue-500 text-lg mr-2" />
-          <input
-            type="text"
-            placeholder="Search"
-            className="flex-1 outline-none text-gray-800 placeholder-gray-500 bg-transparent"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <IoSettingsOutline className="text-blue-500 text-lg" />
-        </div>
-
-        {/* 🏷️ 필터 태그 버튼 */}
-        <div className="flex overflow-x-auto mt-2 space-x-2 scrollbar-hide">
-          {["AI 추천", "AI 내 주변", "AI 크리에이터 추천", "맛집 추천"].map((text) => (
-            <button
-              key={text}
-              className={`whitespace-nowrap px-4 py-1 rounded-full text-sm font-semibold transition-all ${selectedFilter === text
-                ? "bg-blue-600 text-white"
-                : "border border-yellow-400 text-yellow-500 bg-white"
-                }`}
-              onClick={() => setSelectedFilter(text)}
-            >
-              {text}
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* 🔍 검색 바 (컴포넌트로 분리) */}
+      <SearchBar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        selectedFilter={selectedFilter}
+        onFilterSelect={setSelectedFilter}
+        onBack={() => console.log("뒤로가기 버튼 클릭됨")}
+        onLocate={() => {
+          if (location) {
+            console.log("내 위치로 이동:", location);
+          }
+        }}
+      />
 
       {/* 🗺 Google Maps */}
       <LoadScript googleMapsApiKey={apiKey}>
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={location || { lat: 37.5665, lng: 126.978 }}
-          zoom={12}
-          options={{
-            zoomControl: false,
-            streetViewControl: false,
-            mapTypeControl: false,
-            fullscreenControl: false,
-          }}
-        >
+        <GoogleMap mapContainerStyle={containerStyle} center={location || { lat: 37.5665, lng: 126.978 }} zoom={12} options={{
+          zoomControl: false,
+          streetViewControl: false,
+          mapTypeControl: false,
+          fullscreenControl: false,
+        }}>
           {/* 🔴 내 위치 마커 */}
           {location && (
             <Marker
@@ -145,18 +121,12 @@ const GoogleMapComponent = () => {
             .map((content) => (
               <Marker
                 key={content.id}
-                position={{
-                  lat: parseFloat(content.latitude ?? "0"),
-                  lng: parseFloat(content.longitude ?? "0"),
-                }}
+                position={{ lat: parseFloat(content.latitude ?? "0"), lng: parseFloat(content.longitude ?? "0") }}
                 icon={{
-                  url: CATEGORY_ICON_MAP[content.category.toUpperCase()] || CATEGORY_ICON_MAP["DEFAULT"], // 🔥 카테고리별 아이콘 적용
+                  url: CATEGORY_ICON_MAP[content.category.toUpperCase()] || CATEGORY_ICON_MAP["DEFAULT"],
                   scaledSize: new window.google.maps.Size(50, 50),
                 }}
-                onClick={() => {
-                  console.log("category:", content.category || "UNKNOWN CATEGORY"); // ✅ 마커 클릭 시 카테고리 로그 출력
-                  setSelectedContent(content);
-                }}
+                onClick={() => setSelectedContent(content)}
               />
             ))}
         </GoogleMap>
