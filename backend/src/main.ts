@@ -11,7 +11,8 @@ async function bootstrap() {
       .setTitle('TRIT-AI-MAP API 문서')
       .setDescription('TRIT-AI-MAP API 문서')
       .setVersion('1.0')
-      .addTag('TRIT-AI-MAP')
+      .addTag('contents')
+      .addTag('products')
       .build();
 
   const document = SwaggerModule.createDocument(app, config);

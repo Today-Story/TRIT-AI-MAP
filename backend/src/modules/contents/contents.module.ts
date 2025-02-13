@@ -4,12 +4,14 @@ import { ContentsService } from './contents.service';
 import { Content } from './content.entity';
 import { CsvService} from "../csv/csv.service";
 import { CsvModule} from "../csv/csv.module";
+import {ContentsController} from "./contents.controller";
 
 @Module({
   imports: [
       TypeOrmModule.forFeature([Content]),
       CsvModule,
   ],
+  controllers: [ContentsController],
   providers: [ContentsService, CsvService],
   exports: [TypeOrmModule],
 })
