@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import axios from "axios";
-import ContentCard from "./ContentCard";
 import SearchBar from "./SearchBar";
-import CategoryFilter from "./CategoryFilter"; // ✅ 카테고리 필터 추가
+import CategoryFilter from "./CategoryFilter";
+import CardDrawer from "./CardDrawer";
+
+const containerStyle = {
+  width: "390px",
+  height: "690px",
+};
 
 // ✅ ContentData 타입 정의
 type ContentData = {
@@ -24,16 +29,11 @@ type ContentData = {
 
 // 🔥 카테고리별 아이콘 매핑
 const CATEGORY_ICON_MAP: { [key: string]: string } = {
-  "BEAUTY": "/Marker_Beauty.svg",
-  "PLAY": "/Marker_Play.svg",
-  "SHOPPING": "/Marker_Shopping.svg",
-  "FOOD": "/Marker_Tasty.svg",
-  "DEFAULT": "/Marker_Shopping.svg",
-};
-
-const containerStyle = {
-  width: "390px",
-  height: "690px",
+  BEAUTY: "/Marker_Beauty.svg",
+  TRAVEL: "/Marker_Play.svg",
+  SHOPPING: "/Marker_Shopping.svg",
+  FOOD: "/Marker_Tasty.svg",
+  DEFAULT: "/Marker_Shopping.svg",
 };
 
 const GoogleMapComponent = () => {
@@ -41,10 +41,12 @@ const GoogleMapComponent = () => {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [contents, setContents] = useState<ContentData[]>([]);
   const [selectedContent, setSelectedContent] = useState<ContentData | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState<string>("AI 추천");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // ✅ 선택된 카테고리
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isCardOpen, setIsCardOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); // ✅ 검색어 상태 추가
+  const [selectedFilter, setSelectedFilter] = useState<string>("AI 추천"); // ✅ 필터 상태 추가
 
+  // ✅ 현재 위치 가져오기
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -61,30 +63,54 @@ const GoogleMapComponent = () => {
     }
   }, []);
 
-  // ✅ 컨텐츠 데이터 가져오기 (GET /contents)
+  // ✅ 검색 API 활용 (Debounce 적용)
   useEffect(() => {
-    const fetchContents = async () => {
-      try {
-        const response = await axios.get<ContentData[]>("http://localhost:3000/contents");
+    const searchContents = async () => {
+      if (searchTerm.trim() === "") {
+        // 🔹 검색어가 없으면 기본 데이터 유지
+        try {
+          const response = await axios.get<ContentData[]>("http://localhost:3000/contents");
+          setContents(response.data);
+        } catch (error) {
+          console.error("Error fetching default content data:", error);
+        }
+      } else {
+        try {
+          console.log(`🔍 검색 요청: /contents/search?name=${encodeURIComponent(searchTerm)}`);
 
-        // ✅ location이 null이면 빈 문자열로 변환
-        const normalizedContents = response.data.map((content) => ({
-          ...content,
-          location: content.location || "",
-        }));
+          const response = await axios.get<ContentData[]>(
+            `http://localhost:3000/contents/search?name=${encodeURIComponent(searchTerm)}`
+          );
 
-        setContents(normalizedContents);
-      } catch (error) {
-        console.error("Error fetching content data:", error);
+          if (response.data.length === 0) {
+            console.warn("⚠️ 검색 결과 없음:", searchTerm);
+          } else {
+            console.log("✅ 검색 결과:", response.data);
+          }
+
+          setContents(response.data);
+        } catch (error) {
+          console.error("❌ Error fetching search results:", error);
+        }
       }
     };
 
-    fetchContents();
-  }, []);
+    const debounce = setTimeout(() => {
+      searchContents();
+    }, 300); // 🔥 0.3초 동안 입력이 없을 때만 요청
+
+    return () => clearTimeout(debounce);
+  }, [searchTerm]); // ✅ 검색어가 변경될 때마다 API 호출
+
+  // ✅ 지도 클릭 시 카드 닫기
+  const handleMapClick = () => {
+    setIsCardOpen(false);
+    setSelectedContent(null);
+  };
 
   return (
     <div className="relative w-[390px] h-[690px] mx-auto border border-gray-300 rounded-lg overflow-hidden">
-      {/* 🔍 검색 바 */}
+      {/* 🏷️ 검색 및 필터 UI */}
       <SearchBar
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -97,19 +123,23 @@ const GoogleMapComponent = () => {
           }
         }}
       />
-
-      {/* 🏷️ 카테고리 필터 */}
       <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
 
       {/* 🗺 Google Maps */}
       <LoadScript googleMapsApiKey={apiKey}>
-        <GoogleMap mapContainerStyle={containerStyle} center={location || { lat: 37.5665, lng: 126.978 }} zoom={12} options={{
-          zoomControl: false,
-          streetViewControl: false,
-          mapTypeControl: false,
-          fullscreenControl: false,
-        }}>
-          {/* 🔴 내 위치 마커 */}
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={location || { lat: 37.5665, lng: 126.978 }}
+          zoom={12}
+          onClick={handleMapClick}
+          options={{
+            zoomControl: false,
+            streetViewControl: false,
+            mapTypeControl: false,
+            fullscreenControl: false,
+          }} // ✅ 지도 클릭 시 카드 닫기
+        >
+          {/* 🔵 내 위치 마커 */}
           {location && (
             <Marker
               position={location}
@@ -120,7 +150,7 @@ const GoogleMapComponent = () => {
             />
           )}
 
-          {/* 📍 카테고리 필터링 후 마커 표시 */}
+          {/* 📍 API에서 받은 컨텐츠 마커 */}
           {contents
             .filter(
               (content) =>
@@ -133,17 +163,25 @@ const GoogleMapComponent = () => {
                 key={content.id}
                 position={{ lat: parseFloat(content.latitude ?? "0"), lng: parseFloat(content.longitude ?? "0") }}
                 icon={{
-                  url: CATEGORY_ICON_MAP[content.category.toUpperCase()] || CATEGORY_ICON_MAP["DEFAULT"],
+                  url: CATEGORY_ICON_MAP[content.category.toUpperCase()] || CATEGORY_ICON_MAP.DEFAULT,
                   scaledSize: new window.google.maps.Size(50, 50),
                 }}
-                onClick={() => setSelectedContent(content)}
+                onClick={() => {
+                  setSelectedContent(content);
+                  setIsCardOpen(true); // ✅ 마커 클릭 시 카드 열기
+                }}
               />
             ))}
         </GoogleMap>
       </LoadScript>
 
-      {/* ✅ 마커 클릭 시 컨텐츠 상세 카드 표시 */}
-      {selectedContent && <ContentCard content={selectedContent} onClose={() => setSelectedContent(null)} />}
+      {/* ✅ 기본 50개, 마커 클릭 시 1개 데이터 표시 */}
+      <CardDrawer
+        contents={selectedContent ? [selectedContent] : contents.slice(0, 50)}
+        isOpen={isCardOpen}
+        onOpen={() => setIsCardOpen(true)}
+        onClose={() => setIsCardOpen(false)}
+      />
     </div>
   );
 };
