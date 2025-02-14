@@ -61,7 +61,14 @@ export class CsvService {
             likes: Number(data['좋아요']) || 0,
             category: this.mapContentCategory(data['카테고리']) || ContentCategory.ALL,
             location: this.formatLocation(data['위치']),
+            latitude: this.formatCoordinate(data['위도']),
+            longitude: this.formatCoordinate(data['경도']),
         };
+    }
+
+    private formatCoordinate(coordinate: string | undefined): number | null {
+        if (!coordinate || coordinate.trim() === '') return null;
+        return parseFloat(coordinate.trim());
     }
 
     private formatProductData(data: any) {

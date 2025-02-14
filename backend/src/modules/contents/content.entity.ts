@@ -46,7 +46,11 @@ export class Content {
     @Column({ type: 'text', nullable: true })
     location: string;
 
+    // 위도 추가
+    @Column({ type: 'double precision', nullable: true })
+    latitude: number;
 
-
-
+    // 경도 추가
+    @Column({ type: 'double precision', nullable: true })
+    longitude: number;
 }
