@@ -21,17 +21,6 @@ export class UsersService {
         }
 
         try {
-            for (const user of users) {
-                const existingUser = await this.userRepository.findOne({ where: { userId: user.userId } });
-
-                if (!existingUser) {
-                    await this.userRepository.save(user);
-                    console.log(`저장된 사용자: ${user.nickname} (${user.userId})`);
-                } else {
-                    console.log(`이미 존재하는 사용자: ${user.nickname} (${user.userId})`);
-                }
-            }
-
             console.log(`총 ${users.length}명의 사용자 데이터를 저장 완료!`);
         } catch (error) {
             console.error('User 데이터 저장 중 오류 발생:', error);

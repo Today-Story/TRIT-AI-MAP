@@ -44,10 +44,11 @@ export class Content {
 
     @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
     latitude: number;
-    @ManyToOne(() => User, (user) => user.contents, {onDelete: 'CASCADE'})
-    @JoinColumn({ name: 'userId '})
-    user: User;
 
     @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
     longitude: number;
+
+    @ManyToOne(() => User, (user) => user.contents, {onDelete: 'CASCADE'})
+    @JoinColumn({ name: 'userId'})
+    user: User;
 }

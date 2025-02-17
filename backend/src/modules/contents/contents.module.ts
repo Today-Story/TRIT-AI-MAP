@@ -5,6 +5,7 @@ import { Content } from './content.entity';
 import { CsvService} from "../csv/csv.service";
 import { CsvModule} from "../csv/csv.module";
 import {ContentsController} from "./contents.controller";
+import {UsersModule} from "../users/users.module";
 
 @Module({
   imports: [

@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {ILike, Like, Repository} from 'typeorm';
+import {ILike, Repository} from 'typeorm';
 import {Content, ContentCategory} from './content.entity';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class ContentsService {
     constructor(
         @InjectRepository(Content)
         private readonly contentRepository: Repository<Content>,
-    ) {
-    }
+
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+    ) {}
 
     async saveContents(contents: any[]): Promise<void> {
         if (!contents.length) {
@@ -19,20 +22,32 @@ export class ContentsService {
         try {
             console.log(`${contents.length}개의 데이터를 저장합니다.`);
 
-            const validContents = contents.filter(contents => contents !== null);
+            const validContents = [];
 
-            // CSV 파일 순서대로 ID를 부여
-            contents.forEach((item, index) => {
-                item.id = index + 1;
-            });
+            for (const item of contents) {
+                const user = await this.userRepository.findOne({ where: { userId: item.userId } });
+                if (!user) {
+                    console.log(`User not found for userId: ${item.userId}`);
+                    continue; // 해당 데이터는 저장하지 않음
+                }
+                item.userId = user.id; // userId를 실제 DB ID로 변환
+                item.postNumber = item.postNumber ?? 0; // null 방지
+                validContents.push(item);
+            }
 
-            await this.contentRepository.insert(contents);
+            if (validContents.length === 0) {
+                console.log('유효한 데이터가 없습니다.');
+                return;
+            }
+
+            await this.contentRepository.insert(validContents);
 
             console.log('CSV 데이터 저장 완료.');
         } catch (error) {
             console.log('데이터 저장 중 오류 발생:', error);
         }
     }
+
 
     //전체조회
     async findAll(): Promise<Content[]> {
