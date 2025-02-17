@@ -6,8 +6,9 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: nest-backend
+    restart: always
     ports:
-      - "3000:3000"
+      - "3001:3000"
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -15,18 +16,57 @@ services:
       - .env
     depends_on:
       - db
+    networks:
+      - app-network
 
   db:
     image: postgres:14
     container_name: postgres-db
+    restart: always
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    networks:
+      - app-network
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    restart: unless-stopped
+    depends_on:
+      - nginx  # Nginx가 먼저 실행된 후 Certbot이 실행되도록 변경!
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot --webroot-path=/var/www/certbot --email rkdmf9988@gmail.com --agree-tos --no-eff-email -d api.trit.store
 
 volumes:
   postgres-data:
+  certbot-etc:
+  certbot-var:
+
+networks:
+  app-network:
