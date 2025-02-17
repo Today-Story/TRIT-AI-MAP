@@ -19,6 +19,8 @@ export class ContentsService {
         try {
             console.log(`${contents.length}개의 데이터를 저장합니다.`);
 
+            const validContents = contents.filter(contents => contents !== null);
+
             // CSV 파일 순서대로 ID를 부여
             contents.forEach((item, index) => {
                 item.id = index + 1;

@@ -3,13 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContentsModule } from './modules/contents/contents.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CsvModule} from "./modules/csv/csv.module";
+import {UsersModule} from "./modules/users/users.module";
 
 @Module({
     imports: [
         TypeOrmModule.forRoot({
             type: 'postgres',
             host: process.env.DB_HOST || 'localhost',
-            port: parseInt(process.env.DB_PORT, 10) || 5432,
+            port: parseInt(process.env.DB_PORT, 10) || 5433,
             username: process.env.DB_USER || 'postgres',
             password: process.env.DB_PASSWORD || 'postgres',
             database: process.env.DB_NAME || 'mydatabase',
@@ -17,9 +18,10 @@ import { CsvModule} from "./modules/csv/csv.module";
             synchronize: true, // 개발 환경에서만 true (프로덕션 환경에서는 false)
             logging: true,
         }),
-        CsvModule,
+        UsersModule,
         ContentsModule,
         ProductsModule,
+        CsvModule,
     ],
 })
 export class AppModule {}

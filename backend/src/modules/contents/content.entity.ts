@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from 'typeorm';
 import {User} from "../users/user.entity";
 
 export enum ContentCategory {
@@ -23,12 +23,6 @@ export class Content {
     @Column({ type: 'text'})
     url: string;
 
-    @Column({ type: 'varchar', length: 255})
-    author: string;
-
-    @Column({ type: 'varchar', length: 255})
-    authorId: string;
-
     @Column({ type: 'timestamptz' })
     createdAt: Date;
 
@@ -51,6 +45,7 @@ export class Content {
     @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
     latitude: number;
     @ManyToOne(() => User, (user) => user.contents, {onDelete: 'CASCADE'})
+    @JoinColumn({ name: 'userId '})
     user: User;
 
     @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })

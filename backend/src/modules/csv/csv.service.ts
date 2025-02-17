@@ -4,9 +4,21 @@ import * as csvParser from 'csv-parser';
 import * as path from 'path';
 import { ContentCategory } from '../contents/content.entity';
 import { ProductCategory } from '../products/products.entity';
+import {InjectRepository} from "@nestjs/typeorm";
+import {User} from "../users/user.entity";
+import {Repository} from "typeorm";
 
 @Injectable()
 export class CsvService {
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+    ) {}
+
+    async readUserCsv(): Promise<any[]> {
+        return this.readCsvFile('user.csv', this.formatUserData.bind(this));
+    }
+
     async readContentCsv(): Promise<any[]> {
         return this.readCsvFile('content.csv', this.formatContentData.bind(this));
     }
@@ -28,7 +40,7 @@ export class CsvService {
         return new Promise((resolve, reject) => {
             fs.createReadStream(filePath)
                 .pipe(csvParser())
-                .on('data', (data) => {
+                .on('data', async (data) => {
                     const formattedData = this.normalizeCsvKeys(data);
                     results.push(formatter(formattedData));
                 })
@@ -49,22 +61,36 @@ export class CsvService {
         return normalizedData;
     }
 
-    private formatContentData(data: any) {
-        console.log("CSV 데이터:", data); // CSV 데이터를 콘솔에 출력하여 확인
-    
+    private formatUserData(data: any) {
+        return {
+            userId: data['트릿아이디']?.trim(),
+            nickname: data['활동명(닉네임)']?.trim() || '',
+            category: data['카테고리']?.trim() || '',
+            youtube: data['유튜브']?.trim() || null,
+            instagram: data['인스타']?.trim() || null,
+            tiktok: data['틱톡']?.trim() || null,
+            profilePicture: data['프로필사진']?.trim() || null,
+        };
+    }
+
+    private async formatContentData(data: any) {
+
+        const user = await this.userRepository.findOne({ where: { userId: data ['작성자 ID']?.trim() }});
+
+        if (!user) {
+            console.warn(`User not found for userId: ${data['작성자 ID']}`);
+            return null;
+        }
         return {
             postNumber: Number(data['게시물 번호']?.trim()),
             title: data['제목']?.trim() || '',
             url: data['URL']?.trim() || '',
-            author: data['작성자']?.trim() || '',
-            authorId: data['작성자 ID']?.trim() || '',
             createdAt: data['작성시각'] ? new Date(data['작성시각']) : null,
             views: Number(data['조회수']) || 0,
             likes: Number(data['좋아요']) || 0,
             category: this.mapContentCategory(data['카테고리']) || ContentCategory.ALL,
             location: this.formatLocation(data['위치']),
-            latitude: this.parseLatitudeLongitude(data['위도']),
-            longitude: this.parseLatitudeLongitude(data['경도']),
+            user: user,
         };
     }
     

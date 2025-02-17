@@ -10,6 +10,7 @@ import {ContentsController} from "./contents.controller";
   imports: [
       TypeOrmModule.forFeature([Content]),
       CsvModule,
+      UsersModule,
   ],
   controllers: [ContentsController],
   providers: [ContentsService, CsvService],
