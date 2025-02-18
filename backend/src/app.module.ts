@@ -16,7 +16,7 @@ import {UsersModule} from "./modules/users/users.module";
             database: process.env.DB_NAME || 'mydatabase',
             autoLoadEntities: true, // 엔티티를 자동으로 로드
             synchronize: true, // 개발 환경에서만 true (프로덕션 환경에서는 false)
-            logging: false,
+            logging: ['error'],
         }),
         UsersModule,
         ContentsModule,

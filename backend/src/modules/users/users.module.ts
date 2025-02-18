@@ -16,6 +16,6 @@ export class UsersModule implements OnModuleInit {
 
   async onModuleInit() {
     console.log('CSV 데이터 마이그레이션 (users)');
-    await this.userService.importUsersFromCsv();
+    await this.userService.saveUsers();
   }
 }
