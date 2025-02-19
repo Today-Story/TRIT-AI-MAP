@@ -1,30 +1,91 @@
-import { useRef } from "react";
-import ContentCard from "./ContentCard";
+import React, { useEffect } from "react";
+import { ContentData, DrawerMode } from "./GoogleMapComponent";
+import ContentSummary from "./ContentSummary";
+import ContentDetail from "./ContentDetail";
 
-interface CardDrawerProps {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    contents: any[];
-    isOpen: boolean;
-    onOpen: () => void;
-    onClose: () => void;
-}
+type CardDrawerProps = {
+    drawerMode: DrawerMode;
+    setDrawerMode: React.Dispatch<React.SetStateAction<DrawerMode>>;
+    contents: ContentData[];
+    selectedContent: ContentData | null;
+    setSelectedContent: React.Dispatch<React.SetStateAction<ContentData | null>>;
 
-const CardDrawer = ({ contents, isOpen, onOpen, onClose }: CardDrawerProps) => {
-    const drawerRef = useRef<HTMLDivElement | null>(null);
+    // 카드 높이가 바뀔 때 상위로 알림
+    onDrawerHeightChange: (height: number) => void;
+};
+
+const CardDrawer: React.FC<CardDrawerProps> = ({
+    drawerMode,
+    setDrawerMode,
+    contents,
+    selectedContent,
+    onDrawerHeightChange,
+}) => {
+    // 모드에 따라 높이 결정
+    let heightNum = 80; // collapsed
+    if (drawerMode === "summary") heightNum = 270;
+    if (drawerMode === "detail") heightNum = 600;
+
+    // 모드 바뀔 때마다 상위에 알림
+    useEffect(() => {
+        onDrawerHeightChange(heightNum);
+    }, [drawerMode]);
+
+    // (1) collapsed
+    const renderCollapsed = () => (
+        <div className="flex items-center justify-center h-full">
+            {/* 아래만 살짝 보이는 상태 */}
+            <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-bold"
+                onClick={() => setDrawerMode("summary")}
+            >
+                PLAY
+            </button>
+        </div>
+    );
+
+    // (2) summary
+    const renderSummary = () => {
+        // 보통 마커 클릭 시 contents = [1개],  
+        // 그렇지 않으면 10개 중 첫 번째만 요약 표시
+        const place = contents[0];
+        if (!place) return <div>데이터가 없습니다.</div>;
+
+        return (
+            <ContentSummary
+                place={place}
+                onClick={() => setDrawerMode("detail")}
+                onClose={() => setDrawerMode("collapsed")}
+            />
+        );
+    };
+
+    // (3) detail
+    const renderDetail = () => {
+        if (!selectedContent) return <div>데이터가 없습니다.</div>;
+        return (
+            <div className="h-full overflow-y-auto">
+                <ContentDetail
+                    content={selectedContent}
+                    onClose={() => setDrawerMode("summary")}
+                />
+            </div>
+        );
+    };
 
     return (
         <div
-            ref={drawerRef}
-            className={`absolute bottom-4 left-0 w-full bg-transparent transition-transform duration-300 ${isOpen ? "translate-y-[50px]" : "translate-y-[50px]"
-                }`}
+            className={`
+        absolute bottom-0 left-0 w-full
+        bg-white rounded-t-3xl shadow-lg z-10
+        border border-gray-200
+        transition-all duration-300
+      `}
+            style={{ width: "390px", height: `${heightNum}px` }}
         >
-            {/* 📌 튀어나온 부분 (클릭 시 카드 전체 표시) */}
-            <div className="w-full flex justify-center py-10 cursor-pointer bg-[#EEFDFF] rounded-t-3xl" onClick={onOpen}>
-                <div className="w-14 h-2 bg-gray-400 rounded-full"></div>
-            </div>
-
-            {/* 📌 선택된 콘텐츠가 있을 경우 1개만, 없으면 50개 */}
-            {isOpen && <ContentCard contents={contents} onClose={onClose} />}
+            {drawerMode === "collapsed" && renderCollapsed()}
+            {drawerMode === "summary" && renderSummary()}
+            {drawerMode === "detail" && renderDetail()}
         </div>
     );
 };

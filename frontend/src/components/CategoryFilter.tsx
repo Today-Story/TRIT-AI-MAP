@@ -1,52 +1,35 @@
-import { useState } from "react";
-import { IoFilter, IoChevronDown } from "react-icons/io5"; // 필터 아이콘, 드롭다운 아이콘
+import React from "react";
 
-interface CategoryFilterProps {
+type CategoryFilterProps = {
     selectedCategory: string | null;
     onSelectCategory: (category: string | null) => void;
-}
+};
 
-const categories = ["ALL", "TRAVEL", "SHOPPING", "FOOD", "BEAUTY"];
-
-const CategoryFilter = ({ selectedCategory, onSelectCategory }: CategoryFilterProps) => {
-    const [isOpen, setIsOpen] = useState(false);
+const CategoryFilter: React.FC<CategoryFilterProps> = ({
+    selectedCategory,
+    onSelectCategory,
+}) => {
+    // 예: 4개 필터
+    const filters = ["AI 추천", "AI 내 주변", "AI 크리에이터 추천", "맛집 추천"];
 
     return (
-        <div className="absolute bottom-16 right-4 z-50 flex items-center gap-2">
-            {/* 🔘 필터 버튼 */}
-            <div className="relative">
+        <div className="bg-white rounded-full px-2 py-1 flex space-x-2 border border-gray-300 shadow">
+            {filters.map((f) => (
                 <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="bg-[#EEFDFF] text-[#027FFF] shadow-md rounded-full px-4 py-2 flex items-center gap-2 font-semibold border border-[#027FFF]"
+                    key={f}
+                    className={`text-xs font-semibold px-3 py-1 rounded-full ${selectedCategory === f.toUpperCase()
+                        ? "bg-blue-500 text-white"
+                        : "bg-blue-100 text-blue-600"
+                        }`}
+                    onClick={() =>
+                        onSelectCategory(
+                            selectedCategory === f.toUpperCase() ? null : f.toUpperCase()
+                        )
+                    }
                 >
-                    {selectedCategory || "PLAY"}
-                    <IoChevronDown className="text-lg" />
+                    {f}
                 </button>
-
-                {/* 🏷️ 드롭다운 필터 목록 (위쪽으로 생성) */}
-                {isOpen && (
-                    <div className="absolute bottom-full mb-2 w-full bg-white shadow-lg rounded-lg overflow-hidden border border-gray-300">
-                        {categories.map((category) => (
-                            <button
-                                key={category}
-                                className={`w-full text-left px-4 py-2 hover:bg-[#EEFDFF] transition-all ${selectedCategory === category ? "bg-[#027FFF] text-white" : "text-[#027FFF]"
-                                    }`}
-                                onClick={() => {
-                                    onSelectCategory(category === "ALL" ? null : category);
-                                    setIsOpen(false);
-                                }}
-                            >
-                                {category}
-                            </button>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* 🎛️ 필터 아이콘 버튼 */}
-            <button className="bg-[#EEFDFF] text-[#027FFF] shadow-md rounded-full p-3 border border-[#027FFF]">
-                <IoFilter className="text-lg" />
-            </button>
+            ))}
         </div>
     );
 };

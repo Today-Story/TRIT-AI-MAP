@@ -5,29 +5,33 @@ import SearchBar from "./SearchBar";
 import CategoryFilter from "./CategoryFilter";
 import CardDrawer from "./CardDrawer";
 
+// 지도 컨테이너 스타일
 const containerStyle = {
   width: "390px",
   height: "690px",
 };
 
-// ✅ ContentData 타입 정의
-type ContentData = {
+// 서버에서 내려오는 데이터 타입
+export type ContentData = {
   id: number;
   postNumber: string;
   title: string;
-  url: string;
+  url: string;          // 유튜브 영상 URL (임베드 가능)
   author: string;
   authorId: string;
   createdAt: string;
   views: number;
   likes: number;
   category: string;
-  location: string | null;
-  latitude: string | null;
-  longitude: string | null;
+  location: string | null;   // 지도 링크 or 주소
+  latitude: string | null;   // 지도 마커 표시
+  longitude: string | null;  // 지도 마커 표시
 };
 
-// 🔥 카테고리별 아이콘 매핑
+// 하단 드로어 모드
+export type DrawerMode = "collapsed" | "summary" | "detail";
+
+// 카테고리별 마커 아이콘
 const CATEGORY_ICON_MAP: { [key: string]: string } = {
   BEAUTY: "/Marker_Beauty.svg",
   TRAVEL: "/Marker_Play.svg",
@@ -37,80 +41,94 @@ const CATEGORY_ICON_MAP: { [key: string]: string } = {
 };
 
 const GoogleMapComponent = () => {
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [contents, setContents] = useState<ContentData[]>([]);
-  const [selectedContent, setSelectedContent] = useState<ContentData | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [isCardOpen, setIsCardOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(""); // ✅ 검색어 상태 추가
-  const [selectedFilter, setSelectedFilter] = useState<string>("AI 추천"); // ✅ 필터 상태 추가
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "YOUR_GOOGLE_MAP_API_KEY";
 
-  // ✅ 현재 위치 가져오기
+  // 내 위치
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  // 전체 콘텐츠
+  const [contents, setContents] = useState<ContentData[]>([]);
+  // 선택된 콘텐츠 (summary/detail에서 사용)
+  const [selectedContent, setSelectedContent] = useState<ContentData | null>(null);
+
+  // 드로어 모드
+  const [drawerMode, setDrawerMode] = useState<DrawerMode>("collapsed");
+  // 실제 드로어 높이(px)
+  const [drawerHeight, setDrawerHeight] = useState<number>(80);
+
+  // 검색/필터
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<string>("AI 추천");
+
+  // 1) 내 위치 가져오기
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        (pos) => {
           setLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
           });
         },
-        (error) => {
-          console.error("Error fetching location:", error);
+        (err) => {
+          console.error("Error fetching location:", err);
         }
       );
     }
   }, []);
 
-  // ✅ 검색 API 활용 (Debounce 적용)
+  // 2) 검색어에 따른 콘텐츠 불러오기 (Debounce)
   useEffect(() => {
-    const searchContents = async () => {
-      if (searchTerm.trim() === "") {
-        // 🔹 검색어가 없으면 기본 데이터 유지
-        try {
-          const response = await axios.get<ContentData[]>("http://localhost:3000/contents");
-          setContents(response.data);
-        } catch (error) {
-          console.error("Error fetching default content data:", error);
-        }
-      } else {
-        try {
-          console.log(`🔍 검색 요청: /contents/search?name=${encodeURIComponent(searchTerm)}`);
-
-          const response = await axios.get<ContentData[]>(
-            `http://localhost:3000/contents/search?name=${encodeURIComponent(searchTerm)}`
+    const fetchContents = async () => {
+      try {
+        if (!searchTerm.trim()) {
+          // 검색어 없으면 전체 조회
+          const res = await axios.get<ContentData[]>("https://api.trit.store/contents");
+          setContents(res.data);
+        } else {
+          // 검색어가 있으면 검색
+          const res = await axios.get<ContentData[]>(
+            `https://api.trit.store/contents/search?name=${encodeURIComponent(searchTerm)}`
           );
-
-          if (response.data.length === 0) {
-            console.warn("⚠️ 검색 결과 없음:", searchTerm);
-          } else {
-            console.log("✅ 검색 결과:", response.data);
-          }
-
-          setContents(response.data);
-        } catch (error) {
-          console.error("❌ Error fetching search results:", error);
+          setContents(res.data);
         }
+      } catch (error) {
+        console.error("❌ Error fetching contents:", error);
       }
     };
 
-    const debounce = setTimeout(() => {
-      searchContents();
-    }, 300); // 🔥 0.3초 동안 입력이 없을 때만 요청
+    const timer = setTimeout(fetchContents, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-    return () => clearTimeout(debounce);
-  }, [searchTerm]); // ✅ 검색어가 변경될 때마다 API 호출
-
-  // ✅ 지도 클릭 시 카드 닫기
+  // 지도 클릭 => collapsed
   const handleMapClick = () => {
-    setIsCardOpen(false);
+    setDrawerMode("collapsed");
     setSelectedContent(null);
+  };
+
+  // 마커 클릭 => summary 모드 + 선택된 콘텐츠
+  const handleMarkerClick = (content: ContentData) => {
+    setSelectedContent(content);
+    setDrawerMode("summary");
+  };
+
+  // summary 모드에서 표시할 콘텐츠: (마커 클릭이면 1개, 아니면 최대 10개)
+  let drawerContents: ContentData[] = [];
+  if (drawerMode === "summary" && selectedContent) {
+    drawerContents = [selectedContent];
+  } else {
+    drawerContents = contents.slice(0, 10);
+  }
+
+  // (중요) 카드 높이가 바뀔 때마다 필터 컴포넌트 위치 재조정
+  const handleDrawerHeightChange = (height: number) => {
+    setDrawerHeight(height);
   };
 
   return (
     <div className="relative w-[390px] h-[690px] mx-auto border border-gray-300 rounded-lg overflow-hidden">
-      {/* 🏷️ 검색 및 필터 UI */}
+      {/* 상단 검색바 */}
       <SearchBar
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -123,9 +141,20 @@ const GoogleMapComponent = () => {
           }
         }}
       />
-      <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
 
-      {/* 🗺 Google Maps */}
+      {/* 🔥 카테고리 필터 (AI 추천, AI 내 주변, AI 크리에이터 추천, 맛집 추천 등) */}
+      <div
+        // 카드 높이에 따라 bottom 위치를 동적으로 조정해
+        style={{ position: "absolute", bottom: drawerHeight + 10, left: 0, right: 0 }}
+        className="flex justify-center z-20"
+      >
+        <CategoryFilter
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
+      </div>
+
+      {/* 구글 맵 */}
       <LoadScript googleMapsApiKey={apiKey}>
         <GoogleMap
           mapContainerStyle={containerStyle}
@@ -137,9 +166,9 @@ const GoogleMapComponent = () => {
             streetViewControl: false,
             mapTypeControl: false,
             fullscreenControl: false,
-          }} // ✅ 지도 클릭 시 카드 닫기
+          }}
         >
-          {/* 🔵 내 위치 마커 */}
+          {/* 내 위치 마커 */}
           {location && (
             <Marker
               position={location}
@@ -150,37 +179,41 @@ const GoogleMapComponent = () => {
             />
           )}
 
-          {/* 📍 API에서 받은 컨텐츠 마커 */}
+          {/* 콘텐츠 마커 (카테고리 필터 적용) */}
           {contents
-            .filter(
-              (content) =>
-                content.latitude !== null &&
-                content.longitude !== null &&
-                (selectedCategory === null || content.category.toUpperCase() === selectedCategory)
+            .filter((c) =>
+              selectedCategory
+                ? c.category.toUpperCase() === selectedCategory
+                : true
             )
-            .map((content) => (
+            .filter((c) => c.latitude && c.longitude)
+            .map((c) => (
               <Marker
-                key={content.id}
-                position={{ lat: parseFloat(content.latitude ?? "0"), lng: parseFloat(content.longitude ?? "0") }}
+                key={c.id}
+                position={{
+                  lat: parseFloat(c.latitude!),
+                  lng: parseFloat(c.longitude!),
+                }}
                 icon={{
-                  url: CATEGORY_ICON_MAP[content.category.toUpperCase()] || CATEGORY_ICON_MAP.DEFAULT,
+                  url:
+                    CATEGORY_ICON_MAP[c.category.toUpperCase()] ||
+                    CATEGORY_ICON_MAP.DEFAULT,
                   scaledSize: new window.google.maps.Size(50, 50),
                 }}
-                onClick={() => {
-                  setSelectedContent(content);
-                  setIsCardOpen(true); // ✅ 마커 클릭 시 카드 열기
-                }}
+                onClick={() => handleMarkerClick(c)}
               />
             ))}
         </GoogleMap>
       </LoadScript>
 
-      {/* ✅ 기본 50개, 마커 클릭 시 1개 데이터 표시 */}
+      {/* 하단 드로어 */}
       <CardDrawer
-        contents={selectedContent ? [selectedContent] : contents.slice(0, 50)}
-        isOpen={isCardOpen}
-        onOpen={() => setIsCardOpen(true)}
-        onClose={() => setIsCardOpen(false)}
+        drawerMode={drawerMode}
+        setDrawerMode={setDrawerMode}
+        contents={drawerContents}
+        selectedContent={selectedContent}
+        setSelectedContent={setSelectedContent}
+        onDrawerHeightChange={handleDrawerHeightChange}
       />
     </div>
   );
