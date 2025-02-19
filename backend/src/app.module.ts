@@ -4,6 +4,7 @@ import { ContentsModule } from './modules/contents/contents.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CsvModule} from "./modules/csv/csv.module";
 import {UsersModule} from "./modules/users/users.module";
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import {UsersModule} from "./modules/users/users.module";
         ContentsModule,
         ProductsModule,
         CsvModule,
+        AuthModule,
     ],
 })
 export class AppModule {}
