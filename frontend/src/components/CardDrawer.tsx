@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
-import { ContentData, DrawerMode } from "./GoogleMapComponent";
-import ContentSummary from "./ContentSummary";
+
 import ContentDetail from "./ContentDetail";
+import ContentSummary from "./ContentSummary";
+import { ContentData, DrawerMode } from "./GoogleMapComponent";
 
 type CardDrawerProps = {
   drawerMode: DrawerMode;

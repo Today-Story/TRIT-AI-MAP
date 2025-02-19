@@ -1,4 +1,5 @@
 import React from "react";
+
 import { ContentData } from "./GoogleMapComponent";
 
 type ContentSummaryProps = {

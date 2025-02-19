@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+
 import { ContentData } from "./GoogleMapComponent";
 
 type ContentDetailProps = {

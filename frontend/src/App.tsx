@@ -1,6 +1,7 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+
 import { Layout } from "./components";
-import { Home, About, MapPage } from "./pages"; // ✅ MapPage 추가
+import { About, Home, MapPage } from "./pages"; // ✅ MapPage 추가
 
 const App = () => {
   return (
