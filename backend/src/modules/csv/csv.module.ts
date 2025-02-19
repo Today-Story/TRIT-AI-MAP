@@ -3,7 +3,7 @@ import { CsvService} from "./csv.service";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Content} from "../contents/content.entity";
 import {Product} from "../products/products.entity";
-import {User} from "../users/user.entity";
+import {User} from "../users/entities/user.entity";
 import {UsersModule} from "../users/users.module";
 
 @Module({

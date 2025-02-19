@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as session from 'express-session';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {});
@@ -12,6 +13,19 @@ async function bootstrap() {
     allowedHeaders: '*', // 모든 헤더 허용
     credentials: true, // 쿠키/인증 정보를 포함한 요청 허용
   });
+
+  // 세션 미들웨어 추가
+  app.use(
+      session({
+          secret: process.env.SESSION_SECRET || 'default-secret',
+          resave: false,
+          saveUninitialized: false,
+          cookie: {
+              maxAge: 3600000, // 예: 1시간
+              secure: false, // HTTPS 사용 시 true로 변경
+        },
+      }),
+  );
 
   // Swagger 설정
   const config = new DocumentBuilder()

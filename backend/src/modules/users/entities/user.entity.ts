@@ -1,5 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany,} from "typeorm";
-import {Content} from "../contents/content.entity";
+import {Content} from "../../contents/content.entity";
+import {UserRole} from "../enums/user-role.enum";
 
 @Entity()
 export class User {
@@ -29,5 +30,20 @@ export class User {
 
     @OneToMany(() => Content, (content) => content.user)
     contents: Content[];
+
+    @Column({ type: 'varchar', nullable: true})
+    password: string;
+
+    //국적
+    @Column({type:'varchar', nullable: true})
+    nationality: string;
+
+    //회원가입 분류 enum
+    @Column({
+        type: 'enum',
+        enum: UserRole,
+        default: UserRole.NORMAL,
+    })
+    role: UserRole;
 
 }

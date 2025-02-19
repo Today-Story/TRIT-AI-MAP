@@ -1,3 +1,42 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* ✅ 가로 스크롤 시 스크롤바 숨기기 */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ✅ 필터 버튼 텍스트가 두 줄 이상 넘어가지 않도록 설정 */
+.whitespace-nowrap {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gradient-button {
+  border-radius: 20px;
+}
+
+.gradient-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 3px;
+  border-radius: 20px;
+  background: linear-gradient(to right, #ffcc00, #00ccff);
+  -webkit-mask:
+    linear-gradient(#eefdff 0 0) content-box,
+    linear-gradient(#eefdff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}

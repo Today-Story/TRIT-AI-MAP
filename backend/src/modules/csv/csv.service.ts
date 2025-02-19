@@ -5,7 +5,7 @@ import * as path from 'path';
 import { ContentCategory } from '../contents/content.entity';
 import { ProductCategory } from '../products/products.entity';
 import {InjectRepository} from "@nestjs/typeorm";
-import {User} from "../users/user.entity";
+import {User} from "../users/entities/user.entity";
 import {Repository} from "typeorm";
 
 @Injectable()
@@ -155,8 +155,18 @@ export class CsvService {
             location: this.formatLocation(data['위치']),
             latitude: this.parseLatitudeLongitude(data['위도']),
             longitude: this.parseLatitudeLongitude(data['경도']),
+            hashtags: this.parseHashtags(data['해시태그']),
             user: { id: user.id },
         };
+    }
+
+    private parseHashtags(value: string | undefined): string[] {
+        if (!value || value.trim() === '') return [];
+
+        return value
+            .split(',')
+            .map(tag => tag.trim()) // 앞뒤 공백 제거
+            .filter(tag => tag !== ''); // 빈 문자열 제거
     }
 
 

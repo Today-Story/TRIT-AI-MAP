@@ -1,6 +1,6 @@
 // users/user.dto.ts
 import { Expose, Type } from 'class-transformer';
-import {ContentDto} from "../contents/contents.dto";
+import {ContentDto} from "../../contents/contents.dto";
 
 export class UserDto {
     @Expose()
