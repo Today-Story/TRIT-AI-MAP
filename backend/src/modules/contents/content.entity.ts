@@ -48,6 +48,9 @@ export class Content {
     @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
     longitude: number;
 
+    @Column({ type: 'simple-array', nullable: true })
+    hashtags: string[];
+
     @ManyToOne(() => User, (user) => user.contents, {onDelete: 'CASCADE'})
     @JoinColumn({ name: 'userId'})
     user: User;

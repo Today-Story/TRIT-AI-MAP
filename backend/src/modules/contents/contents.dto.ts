@@ -36,4 +36,8 @@ export class ContentDto {
 
     @Expose()
     longitude: number;
+
+    @Expose()
+    hashtags: string[];
+
 }
