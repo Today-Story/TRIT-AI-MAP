@@ -5,7 +5,7 @@ import * as path from 'path';
 import { ContentCategory } from '../contents/content.entity';
 import { ProductCategory } from '../products/products.entity';
 import {InjectRepository} from "@nestjs/typeorm";
-import {User} from "../users/user.entity";
+import {User} from "../users/entities/user.entity";
 import {Repository} from "typeorm";
 
 @Injectable()

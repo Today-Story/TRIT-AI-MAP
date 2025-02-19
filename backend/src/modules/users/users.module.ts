@@ -1,8 +1,8 @@
 import {Module, OnModuleInit} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
-import { User } from './user.entity';
+import { UsersController } from './controller/users.controller';
+import { UsersService } from './services/users.service';
+import { User } from './entities/user.entity';
 import {CsvService} from "../csv/csv.service";
 
 @Module({
