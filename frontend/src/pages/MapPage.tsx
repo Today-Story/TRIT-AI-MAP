@@ -189,6 +189,16 @@ const MapPage = () => {
             ))}
         </GoogleMap>
       </LoadScript>
+
+      {/* 하단 드로어 */}
+      <CardDrawer
+        drawerMode={drawerMode}
+        setDrawerMode={setDrawerMode}
+        contents={drawerContents}
+        selectedContent={selectedContent}
+        setSelectedContent={setSelectedContent}
+        onDrawerHeightChange={handleDrawerHeightChange}
+      />
     </div>
   );
 };
