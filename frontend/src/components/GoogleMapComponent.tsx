@@ -16,16 +16,16 @@ export type ContentData = {
   id: number;
   postNumber: string;
   title: string;
-  url: string;          // 유튜브 영상 URL (임베드 가능)
+  url: string; // 유튜브 영상 URL (임베드 가능)
   author: string;
   authorId: string;
   createdAt: string;
   views: number;
   likes: number;
   category: string;
-  location: string | null;   // 지도 링크 or 주소
-  latitude: string | null;   // 지도 마커 표시
-  longitude: string | null;  // 지도 마커 표시
+  location: string | null; // 지도 링크 or 주소
+  latitude: string | null; // 지도 마커 표시
+  longitude: string | null; // 지도 마커 표시
 };
 
 // 하단 드로어 모드
@@ -182,9 +182,7 @@ const GoogleMapComponent = () => {
           {/* 콘텐츠 마커 (카테고리 필터 적용) */}
           {contents
             .filter((c) =>
-              selectedCategory
-                ? c.category.toUpperCase() === selectedCategory
-                : true
+              selectedCategory ? c.category.toUpperCase() === selectedCategory : true
             )
             .filter((c) => c.latitude && c.longitude)
             .map((c) => (
@@ -195,9 +193,7 @@ const GoogleMapComponent = () => {
                   lng: parseFloat(c.longitude!),
                 }}
                 icon={{
-                  url:
-                    CATEGORY_ICON_MAP[c.category.toUpperCase()] ||
-                    CATEGORY_ICON_MAP.DEFAULT,
+                  url: CATEGORY_ICON_MAP[c.category.toUpperCase()] || CATEGORY_ICON_MAP.DEFAULT,
                   scaledSize: new window.google.maps.Size(50, 50),
                 }}
                 onClick={() => handleMarkerClick(c)}

@@ -7,23 +7,14 @@ type ContentSummaryProps = {
   onClose: () => void; // collapsed 모드로
 };
 
-const ContentSummary: React.FC<ContentSummaryProps> = ({
-  place,
-  onClick,
-  onClose,
-}) => {
+const ContentSummary: React.FC<ContentSummaryProps> = ({ place, onClick, onClose }) => {
   // 첫 번째 주소만 사용(쉼표 구분일 경우)
-  const locationStr = place.location
-    ? place.location.split(",")[0]
-    : "위치 정보 없음";
+  const locationStr = place.location ? place.location.split(",")[0] : "위치 정보 없음";
 
   return (
     <div className="relative w-full h-full p-3 flex flex-row  bg-white rounded-md shadow">
       {/* 닫기 버튼 (오른쪽 상단) */}
-      <button
-        className="absolute top-2 right-2 text-sm text-gray-500"
-        onClick={onClose}
-      >
+      <button className="absolute top-2 right-2 text-sm text-gray-500" onClick={onClose}>
         X
       </button>
 
@@ -55,24 +46,16 @@ const ContentSummary: React.FC<ContentSummaryProps> = ({
         </div>
 
         {/* 주소 (줄바꿈/폭 제한) */}
-        <p className="text-xs text-gray-700 mb-0.5 break-words max-w-[200px]">
-          {locationStr}
-        </p>
+        <p className="text-xs text-gray-700 mb-0.5 break-words max-w-[200px]">{locationStr}</p>
 
         {/* 리뷰 */}
-        <p className="text-xs text-gray-500 mb-0.5">
-          트윗 리뷰 20개 · 구글 리뷰 10개
-        </p>
+        <p className="text-xs text-gray-500 mb-0.5">트윗 리뷰 20개 · 구글 리뷰 10개</p>
 
         {/* 평점 + 해시태그 */}
         <div className="flex items-center space-x-2 text-[10px]">
           <span className="text-sm text-blue-600">★ 4.5</span>
-          <span className="bg-blue-100 text-blue-600 px-1 py-[2px] rounded">
-            #Cafe
-          </span>
-          <span className="bg-blue-100 text-blue-600 px-1 py-[2px] rounded">
-            #Hotplace
-          </span>
+          <span className="bg-blue-100 text-blue-600 px-1 py-[2px] rounded">#Cafe</span>
+          <span className="bg-blue-100 text-blue-600 px-1 py-[2px] rounded">#Hotplace</span>
         </div>
       </div>
     </div>
