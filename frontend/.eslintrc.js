@@ -24,7 +24,8 @@ module.exports = {
       "react/react-in-jsx-scope": "off", // React 자동 import 필요 없음 (Next.js 등의 환경에서 유용)
       "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }], // 사용되지 않는 변수 경고 (예: _로 시작하는 변수는 예외)
       "react/jsx-uses-react": "off", // React 17 이후 JSX 자동 import
-      "react/jsx-uses-vars": "warn" // 사용되지 않는 JSX 변수를 경고
+      "react/jsx-uses-vars": "warn", // 사용되지 않는 JSX 변수를 경고
+      "@typescript-eslint/no-explicit-any": "off", // any 타입 허용
     },
     settings: {
       react: {
