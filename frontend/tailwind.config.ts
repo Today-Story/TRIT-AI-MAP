@@ -2,7 +2,22 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: {
+          100: "#EEFDFF",
+          200: "#AAD0F7",
+          300: "#007FFF",
+        },
+        placeholder: "#A6D6F4",
+      },
+      maxWidth: {
+        mobile: "450px",
+      },
+      screens: {
+        mobile: "450px",
+      },
+    },
   },
   plugins: [],
 };

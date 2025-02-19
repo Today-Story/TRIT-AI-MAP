@@ -10,7 +10,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ selectedCategory, onSel
   const filters = ["AI 추천", "AI 내 주변", "AI 크리에이터 추천", "맛집 추천"];
 
   return (
-    <div className="bg-white rounded-full px-2 py-1 flex space-x-2 border border-gray-300 shadow">
+    <div className="bg-white rounded-full px-2 py-1 flex justify-center space-x-2 border border-gray-300 shadow">
       {filters.map((f) => (
         <button
           key={f}

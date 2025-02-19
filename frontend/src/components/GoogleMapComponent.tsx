@@ -10,8 +10,10 @@ import SearchBar from "./SearchBar";
 
 // 지도 컨테이너 스타일
 const containerStyle = {
-  width: "390px",
-  height: "690px",
+  // width: "390px",
+  width: "100vw",
+  // height: "690px",
+  height: "100vh",
 };
 
 // 서버에서 내려오는 데이터 타입
@@ -130,7 +132,7 @@ const GoogleMapComponent = () => {
   };
 
   return (
-    <div className="relative w-[390px] h-[690px] mx-auto border border-gray-300 rounded-lg overflow-hidden">
+    <div className="relative h-full mx-auto border border-gray-300 rounded-lg overflow-hidden">
       {/* 상단 검색바 */}
       <SearchBar
         searchTerm={searchTerm}
@@ -144,18 +146,6 @@ const GoogleMapComponent = () => {
           }
         }}
       />
-
-      {/* 🔥 카테고리 필터 (AI 추천, AI 내 주변, AI 크리에이터 추천, 맛집 추천 등) */}
-      <div
-        // 카드 높이에 따라 bottom 위치를 동적으로 조정해
-        style={{ position: "absolute", bottom: drawerHeight + 10, left: 0, right: 0 }}
-        className="flex justify-center z-20"
-      >
-        <CategoryFilter
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-        />
-      </div>
 
       {/* 구글 맵 */}
       <LoadScript googleMapsApiKey={apiKey}>
