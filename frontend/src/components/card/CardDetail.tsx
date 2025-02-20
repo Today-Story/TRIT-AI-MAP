@@ -57,7 +57,7 @@ export default function CardDetail({ selectedContent, address, setDrawerMode }: 
           <MdClose size={24} />
         </button>
         <div className="flex gap-2 items-center">
-          <div className="w-1/2 aspect-square bg-primary-300 rounded-xl" />
+          <div className="w-1/3 shrink-0 aspect-square bg-primary-300 rounded-xl" />
           <div className="truncate flex flex-col gap-2">
             <div>
               <p className="text-sm truncate font-bold">{selectedContent.title}</p>
