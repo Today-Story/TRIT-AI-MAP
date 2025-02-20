@@ -2,6 +2,7 @@ import StarRating from "@components/StarRating";
 
 import { MdArrowForward } from "react-icons/md";
 
+import BookItem from "./BookItem";
 import Coupon from "./Coupon";
 
 const tritCoupons = [
@@ -29,6 +30,30 @@ const brandCoupons = [
     content: "시술 30% 할인 쿠폰",
     description: "02.18 - 03.18",
     buttonText: "GET BENEFIT",
+  },
+];
+
+const bookItems = [
+  {
+    id: 1,
+    title: "피부 광택 시술",
+    description: "피부에 빛을 내주는~~",
+    informations: ["시술 정보1", "시술 정보2"],
+    schedule: "월-금",
+  },
+  {
+    id: 2,
+    title: "피부 광택 시술",
+    description: "피부에 빛을 내주는~~",
+    informations: ["시술 정보1", "시술 정보2"],
+    schedule: "월-금",
+  },
+  {
+    id: 3,
+    title: "피부 광택 시술",
+    description: "피부에 빛을 내주는~~",
+    informations: ["시술 정보1", "시술 정보2"],
+    schedule: "월-금",
   },
 ];
 
@@ -119,22 +144,9 @@ export default function Home({ onClickViewMore }: HomeProps) {
           </button>
         </div>
         <div className="space-y-3">
-          <div className="flex flex-col gap-3 relative bg-primary-100 rounded-lg p-2">
-            <div className="flex justify-between">
-              <div className="flex flex-col justify-between">
-                <p className="font-semibold">피부 광택 시술</p>
-                <p className="font-medium text-sm">피부에 빛을 내주는~~</p>
-              </div>
-              <div className="w-1/5 bg-gray-200 rounded-lg aspect-square" />
-            </div>
-            <hr className="border-gray-200" />
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-primary-300 font-medium">시술 정보1 / 시술 정보2 / 월-금</span>
-              <button className="text-white bg-primary-300 rounded-full py-1 px-2 font-semibold">
-                BOOK
-              </button>
-            </div>
-          </div>
+          {bookItems.map((item) => (
+            <BookItem key={item.id} {...item} onClickBook={() => {}} />
+          ))}
         </div>
       </div>
     </div>
