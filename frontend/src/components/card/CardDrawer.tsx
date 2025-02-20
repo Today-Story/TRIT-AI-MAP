@@ -74,19 +74,21 @@ export default function CardDrawer({
         drawerMode !== "collapsed" && "-translate-y-5"
       )}
     >
-      <div className="flex gap-2 self-end">
-        <button
-          onClick={onToggleDrawer}
-          className="flex gap-5 bg-primary-100 text-primary-300 rounded-full w-max py-2 px-4 border border-primary-200 items-center shadow-md shadow-primary-200"
-        >
-          PLAY
-          <MdOutlineKeyboardArrowDown size={24} />
-        </button>
-        <button className="flex items-center justify-center aspect-square h-10 bg-primary-100 rounded-full w-max border border-primary-200 shadow-md shadow-primary-200">
-          <MdOutlineFilterList size={24} color="#007FFF" />
-        </button>
-      </div>
-      <div className="rounded-t-3xl shadow-lg z-10 transition-all duration-300">
+      {drawerMode !== "detail" && (
+        <div className="flex gap-2 self-end">
+          <button
+            onClick={onToggleDrawer}
+            className="flex gap-5 bg-primary-100 text-primary-300 rounded-full w-max py-2 px-4 border border-primary-200 items-center shadow-md shadow-primary-200"
+          >
+            PLAY
+            <MdOutlineKeyboardArrowDown size={24} />
+          </button>
+          <button className="flex items-center justify-center aspect-square h-10 bg-primary-100 rounded-full w-max border border-primary-200 shadow-md shadow-primary-200">
+            <MdOutlineFilterList size={24} color="#007FFF" />
+          </button>
+        </div>
+      )}
+      <div className="rounded-3xl shadow-lg z-10 transition-all duration-300 max-h-1/4">
         {drawerMode === "collapsed" ? (
           <EmptyCard />
         ) : drawerMode === "summary" ? (

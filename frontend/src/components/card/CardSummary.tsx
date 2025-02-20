@@ -64,7 +64,7 @@ export default function CardSummary({ place, currentLocation, setDrawerMode }: C
         onClick={() => setDrawerMode("detail")}
         className="flex-[2] overflow-hidden flex flex-col justify-center gap-4 text-start"
       >
-        <div className="flex gap-2">
+        <div className="flex gap-2 text-dark-blue">
           <div className="min-w-16 min-h-16 bg-primary-300 rounded-xl" />
           <div className="truncate flex flex-col justify-between">
             <p className="text-sm truncate font-bold">{place.title}</p>
@@ -76,7 +76,7 @@ export default function CardSummary({ place, currentLocation, setDrawerMode }: C
           </div>
         </div>
         <div>
-          <div className="text-xs flex gap-2 items-center font-semibold">
+          <div className="text-xs flex gap-2 items-center font-semibold text-dark-blue">
             <span>트릿 리뷰 20개</span>
             <div className="w-0.5 h-3 bg-primary-200" />
             <span>구글 리뷰 10개</span>
