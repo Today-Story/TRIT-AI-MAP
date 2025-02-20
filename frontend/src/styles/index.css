@@ -23,15 +23,15 @@ body {
   text-overflow: ellipsis;
 }
 
-.gradient-button {
+.gradient-chip {
   border-radius: 20px;
 }
 
-.gradient-button::before {
+.gradient-chip::before {
   content: "";
   position: absolute;
   inset: 0;
-  padding: 3px;
+  padding: 2px;
   border-radius: 20px;
   background: linear-gradient(to right, #ffcc00, #00ccff);
   -webkit-mask:

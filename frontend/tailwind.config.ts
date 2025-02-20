@@ -17,6 +17,12 @@ export default {
       screens: {
         mobile: "450px",
       },
+      aspectRatio: {
+        "video-vertical": "9 / 16",
+      },
+      fontSize: {
+        xxs: "0.625rem",
+      },
     },
   },
   plugins: [],

@@ -1,9 +1,9 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 
-import { ContentData } from "./GoogleMapComponent";
+import { ContentDTO } from "@services/contents";
 
 type ContentDetailProps = {
-  content: ContentData;
+  content: ContentDTO;
   onClose: () => void; // detail -> summary
 };
 
