@@ -65,7 +65,7 @@ export default function CardSummary({ place, currentLocation, setDrawerMode }: C
         className="flex-[2] overflow-hidden flex flex-col justify-center gap-4 text-start"
       >
         <div className="flex gap-2 text-dark-blue">
-          <div className="min-w-16 min-h-16 bg-primary-300 rounded-xl" />
+          <div className="w-1/3 shrink-0 aspect-square bg-primary-300 rounded-xl" />
           <div className="truncate flex flex-col justify-between">
             <p className="text-sm truncate font-bold">{place.title}</p>
             <p className="text-xs truncate">{address.name}</p>
