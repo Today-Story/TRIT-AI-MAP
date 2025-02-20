@@ -10,7 +10,7 @@ const dummyData = [
 
 export default function Video() {
   return (
-    <div className="grid grid-cols-2 gap-4 py-3">
+    <section className="grid grid-cols-2 gap-4 py-3">
       {dummyData.map((video) => (
         <div key={video.id} className="rounded-xl overflow-hidden shadow bg-primary-100">
           <div className="relative w-full aspect-video-vertical">
@@ -33,6 +33,6 @@ export default function Video() {
           </div>
         </div>
       ))}
-    </div>
+    </section>
   );
 }
