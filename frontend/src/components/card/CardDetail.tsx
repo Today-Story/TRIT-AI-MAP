@@ -58,21 +58,25 @@ export default function CardDetail({ selectedContent, address, setDrawerMode }: 
         </button>
         <div className="flex gap-2 items-center">
           <div className="w-1/2 aspect-square bg-primary-300 rounded-xl" />
-          <div className="truncate flex flex-col">
-            <p className="text-sm truncate font-bold">{selectedContent.title}</p>
-            <div className="flex gap-2 text-xs">
-              <span className="truncate">{address.name}</span>
-              <span className="font-medium">{address.distance}km</span>
+          <div className="truncate flex flex-col gap-2">
+            <div>
+              <p className="text-sm truncate font-bold">{selectedContent.title}</p>
+              <div className="flex gap-2 text-xs">
+                <span className="truncate">{address.name}</span>
+                <span className="font-medium">{address.distance}km</span>
+              </div>
             </div>
-            <div className="flex gap-1 text-xs text-primary-300 items-center">
-              <MdLocalPhone color="#007FFF" size={16} />
-              053-637-9999
-            </div>
-            <StarRating rating={4.5} />
-            <div className="flex gap-2 text-xs">
-              {selectedContent.hashtags.map((tag) => (
-                <Tag key={tag} tag={tag} />
-              ))}
+            <div className="space-y-1">
+              <div className="flex gap-1 text-xs text-primary-300 items-center">
+                <MdLocalPhone color="#007FFF" size={16} />
+                053-637-9999
+              </div>
+              <StarRating rating={4.5} />
+              <div className="flex gap-2 text-xs">
+                {selectedContent.hashtags.map((tag) => (
+                  <Tag key={tag} tag={tag} />
+                ))}
+              </div>
             </div>
           </div>
         </div>
