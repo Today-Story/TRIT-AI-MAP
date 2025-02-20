@@ -1,11 +1,11 @@
-import { useState } from "react";
-
 import { cn } from "@utils/cn";
 
 import { MdGpsFixed, MdOutlineKeyboardArrowLeft, MdOutlineSearch } from "react-icons/md";
 
 interface SearchBarProps {
   searchTerm: string;
+  selectedFilter: string;
+  onSelectFilter: (value: string) => void;
   onSearchChange: (value: string) => void;
   onSearch: () => void;
   onBack: () => void;
@@ -16,13 +16,13 @@ const CATEGORIES = ["AI 추천", "AI 내 주변", "AI 크리에이터 추천", "
 
 const SearchBar: React.FC<SearchBarProps> = ({
   searchTerm,
+  selectedFilter,
+  onSelectFilter,
   onSearchChange,
   onSearch,
   onBack,
   onLocate,
 }) => {
-  const [selectedFilter, setSelectedFilter] = useState<string>("AI 추천");
-
   return (
     <header className="fixed z-10 px-5 top-2.5 flex flex-col gap-3 max-w-mobile w-full">
       <div className="flex items-center gap-2 flex-1 justify-between">
@@ -55,9 +55,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
           {CATEGORIES.map((category) => (
             <button
               key={category}
-              onClick={() => setSelectedFilter(category)}
+              onClick={() => onSelectFilter(category)}
               className={cn(
-                "relative outline-none font-bold py-2 px-4 text-sm whitespace-nowrap gradient-button",
+                "relative outline-none font-bold py-2 px-4 text-sm whitespace-nowrap gradient-chip",
                 selectedFilter === category
                   ? "bg-primary-300 text-primary-100"
                   : "bg-primary-100 text-primary-300"
