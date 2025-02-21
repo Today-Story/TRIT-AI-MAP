@@ -1,9 +1,9 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany,} from "typeorm";
 import {Content} from "../../contents/content.entity";
-import {UserRole} from "../enums/user-role.enum";
+import {UserRole} from "../../users/enums/users-role.enum";
 
 @Entity()
-export class User {
+export class Creators {
     @PrimaryGeneratedColumn()
     id: number;
 

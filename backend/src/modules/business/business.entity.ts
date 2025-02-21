@@ -1,6 +1,6 @@
 import {Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-export enum ProductCategory {
+export enum BusinessCategory {
     OUTDOOR = '아웃도어',
     INDOOR = '인도어',
     BEAUTY = '뷰티서비스',
@@ -12,15 +12,15 @@ export enum ProductCategory {
 }
 
 @Entity()
-export class Product {
+export class Business {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column({type: 'varchar', length: 255})
     name: string;
 
-    @Column({ type: 'enum', enum: ProductCategory, nullable: true, default: ProductCategory.ALL })
-    category: ProductCategory;
+    @Column({ type: 'enum', enum: BusinessCategory, nullable: true, default: BusinessCategory.ALL })
+    category: BusinessCategory;
 
     @Column({type: 'varchar', length: 255, nullable: true})
     price: string;

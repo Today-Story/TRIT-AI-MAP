@@ -6,7 +6,7 @@ import { LoginDto } from '../dto/login.dto';
 import { AuthService } from '../services/auth.service';
 import { AuthUserDto } from '../dto/auth-user-dto';
 import {S3Service} from "../../s3/s3.service";
-import {UserRole} from "../../users/enums/user-role.enum";
+import {UserRole} from "../../users/enums/users-role.enum";
 import {FileInterceptor} from "@nestjs/platform-express";
 
 @ApiTags('auth')

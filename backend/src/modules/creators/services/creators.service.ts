@@ -1,18 +1,18 @@
 import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
-import {User} from '../entities/user.entity';
+import {Creators} from '../entities/creators.entity';
 import {CsvService} from '../../csv/csv.service';
-import {UserDto} from '../dto/user.dto';
+import {CreatorsDto} from '../dto/creators.dto';
 import {plainToInstance} from 'class-transformer';
-import {UserRole} from "../enums/user-role.enum";
+import {UserRole} from "../../users/enums/users-role.enum";
 
 
 @Injectable()
-export class UsersService {
+export class CreatorsService {
     constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
+        @InjectRepository(Creators)
+        private readonly creatorRepository: Repository<Creators>,
         private readonly csvService: CsvService,
     ) {}
 
@@ -33,10 +33,10 @@ export class UsersService {
         }));
 
         try {
-            await this.userRepository
+            await this.creatorRepository
                 .createQueryBuilder()
                 .insert()
-                .into(User)
+                .into(Creators)
                 .values(uniqueUsers)
                 .onConflict(`("userId") DO NOTHING`) // 중복이면 삽입 무시
                 .execute();
@@ -48,16 +48,16 @@ export class UsersService {
 
 
 
-    async findAllCreators(): Promise<UserDto[]> {
-        const creators = await this.userRepository.find({
+    async findAllCreators(): Promise<CreatorsDto[]> {
+        const creators = await this.creatorRepository.find({
             where: { role: UserRole.CREATOR }, // 역할이 'CREATOR'인 사용자만 조회
             select: ['id', 'userId', 'nickname', 'category', 'youtube', 'instagram', 'tiktok', 'profilePicture'],
         });
-        return plainToInstance(UserDto, creators, { excludeExtraneousValues: true });
+        return plainToInstance(CreatorsDto, creators, { excludeExtraneousValues: true });
     }
 
-    async findCreatorByIdWithContents(id: number): Promise<UserDto> {
-        const creator = await this.userRepository.findOne({
+    async findCreatorByIdWithContents(id: number): Promise<CreatorsDto> {
+        const creator = await this.creatorRepository.findOne({
             where: { id, role: UserRole.CREATOR },
             relations: ['contents'],
         });
@@ -66,6 +66,6 @@ export class UsersService {
             throw new NotFoundException(`ID ${id}에 해당하는 크리에이터를 찾을 수 없습니다.`);
         }
 
-        return plainToInstance(UserDto, creator, { excludeExtraneousValues: true });
+        return plainToInstance(CreatorsDto, creator, { excludeExtraneousValues: true });
     }
 }

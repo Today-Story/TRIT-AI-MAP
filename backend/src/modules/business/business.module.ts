@@ -1,31 +1,31 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { ProductsService } from './products.service';
+import { BusinessService } from './business.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import {Product} from "./products.entity";
 import {CsvService} from "../csv/csv.service";
 import { CsvModule} from "../csv/csv.module";
-import { ProductsController} from "./products.controller";
+import { BusinessController} from "./business.controller";
+import {Business} from "./business.entity";
 
 
 @Module({
   imports: [
-      TypeOrmModule.forFeature([Product]),
+      TypeOrmModule.forFeature([Business]),
       CsvModule,
   ],
-  controllers: [ProductsController],
-  providers: [ProductsService, CsvService],
+  controllers: [BusinessController],
+  providers: [BusinessService, CsvService],
   exports: [TypeOrmModule],
 })
 
 
-export class ProductsModule implements OnModuleInit {
+export class BusinessModule implements OnModuleInit {
   constructor(
       private readonly csvService: CsvService,
-      private readonly productService: ProductsService,
+      private readonly productService: BusinessService,
   ) {}
 
   async onModuleInit() {
-    console.log('CSV 데이터 마이그레이션 (products)');
+    console.log('CSV 데이터 마이그레이션 (business)');
     try {
       const data = await this.csvService.readProductCsv();
       await this.productService.saveProducts(data);

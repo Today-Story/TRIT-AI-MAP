@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {Repository} from "typeorm";
-import { Product, ProductCategory } from "./products.entity";
+import {Business, BusinessCategory} from "./business.entity";
 
 @Injectable()
-export class ProductsService {
+export class BusinessService {
     constructor(
-        @InjectRepository(Product)
-        private readonly productRepository: Repository<Product>,
+        @InjectRepository(Business)
+        private readonly productRepository: Repository<Business>,
     )
     {}
 
@@ -43,17 +43,17 @@ export class ProductsService {
 
 
     //전체 상품 조회
-    async findAll(): Promise<Product[]> {
+    async findAll(): Promise<Business[]> {
         return await this.productRepository.find();
     }
 
     //ID로 조회
-    async findById(id: number): Promise<Product | null> {
+    async findById(id: number): Promise<Business | null> {
         return await this.productRepository.findOne({where: {id}});
     }
 
     //카테고리 별 조회
-    async findByCategory(category: string): Promise<Product[]> {
+    async findByCategory(category: string): Promise<Business[]> {
         if (category === '전체' || category.toUpperCase() === 'ALL') {
             // '전체' 또는 'ALL' 입력 시 모든 데이터 반환
             return await this.productRepository.find();
@@ -61,7 +61,7 @@ export class ProductsService {
 
         const decodedCategory = decodeURIComponent(category); // 한글 URL 복원
 
-        const categoryEnum = Object.values(ProductCategory).find(cat => cat === decodedCategory) as ProductCategory;
+        const categoryEnum = Object.values(BusinessCategory).find(cat => cat === decodedCategory) as BusinessCategory;
 
         if (!categoryEnum) {
             throw new Error(`잘못된 카테고리 값: ${decodedCategory}`);
@@ -74,7 +74,7 @@ export class ProductsService {
 
 
     //상품 별 조회
-    async searchByName(name: string): Promise<Product[]> {
+    async searchByName(name: string): Promise<Business[]> {
         return await this.productRepository
             .createQueryBuilder('product')
             .where('product.name ILIKE :name', { name: `%${name}%`})

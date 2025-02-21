@@ -1,8 +1,8 @@
-// users/user.dto.ts
+// creators/creators.dto.ts
 import { Expose, Type } from 'class-transformer';
 import {ContentDto} from "../../contents/contents.dto";
 
-export class UserDto {
+export class CreatorsDto {
     @Expose()
     id: number;
 
