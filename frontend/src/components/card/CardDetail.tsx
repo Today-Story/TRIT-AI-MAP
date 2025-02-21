@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ContentDTO } from "@services/contents";
+import { ProductDTO } from "@services/products";
 import { cn } from "@utils/cn";
 
+import { getProductById } from "apis/products";
 import { MdClose, MdLocalPhone } from "react-icons/md";
 
 import { DrawerMode } from "./CardDrawer";
@@ -24,6 +26,7 @@ const MENUS = ["Home", "Video", "Product", "Book", "Brand"];
 
 export default function CardDetail({ selectedContent, address, setDrawerMode }: CardDetailProps) {
   const [selectedMenu, setSelectedMenu] = useState("Home");
+  const [products, setProducts] = useState<ProductDTO[]>([]);
 
   const onSelectMenu = (menu: string) => {
     setSelectedMenu(menu);
@@ -36,19 +39,32 @@ export default function CardDetail({ selectedContent, address, setDrawerMode }: 
   const renderInnerContent = () => {
     switch (selectedMenu) {
       case "Home":
-        return <Home onClickViewMore={setSelectedMenu} />;
+        return <Home products={products} onClickViewMore={setSelectedMenu} />;
       case "Video":
         return <Video />;
       case "Product":
-        return <Product />;
+        return <Product products={products} />;
       case "Book":
         return <Book />;
       case "Brand":
         return <Brand />;
       default:
-        return <Home onClickViewMore={setSelectedMenu} />;
+        return <Home products={products} onClickViewMore={setSelectedMenu} />;
     }
   };
+
+  useEffect(() => {
+    const fetchItem = async () => {
+      const randomId = Math.floor(Math.random() * 76) + 1;
+      const productResponse = await getProductById(randomId);
+      if (productResponse.status !== 200) {
+        setProducts([]);
+        return;
+      }
+      setProducts([productResponse.data]);
+    };
+    fetchItem();
+  }, []);
 
   return selectedContent ? (
     <section className="h-full shadow-md shadow-primary-200 bg-primary-100 rounded-3xl overflow-auto hide-scrollbar max-h-drawer text-dark-blue">
