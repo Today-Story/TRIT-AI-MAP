@@ -9,7 +9,7 @@ async function bootstrap() {
 
   // 모든 도메인에서의 CORS 허용
   app.enableCors({
-    origin: '*', // 모든 출처 허용
+    origin: 'https://trit.framer.ai', // 모든 출처 허용
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // 허용할 HTTP 메서드
     allowedHeaders: '*', // 모든 헤더 허용
     credentials: true, // 쿠키/인증 정보를 포함한 요청 허용
@@ -24,6 +24,7 @@ async function bootstrap() {
           cookie: {
               maxAge: 3600000, // 예: 1시간
               secure: true, // HTTPS 사용 시 true로 변경
+              sameSite: 'none'
         },
       }),
   );
