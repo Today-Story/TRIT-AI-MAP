@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {ApiProperty, ApiPropertyOptional} from '@nestjs/swagger';
+import {IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString} from 'class-validator';
 import { UserRole } from '../../users/enums/user-role.enum';
 
 export class RegisterUserDto {
@@ -7,7 +7,7 @@ export class RegisterUserDto {
     @IsEmail()
     email: string;
 
-    @ApiProperty({ description: '비밀번호', example: 'securepassword123' })
+    @ApiProperty({ description: '비밀번호', example: 'password123' })
     @IsNotEmpty()
     @IsString()
     password: string;
@@ -17,8 +17,9 @@ export class RegisterUserDto {
     @IsString()
     nickname: string;
 
-    @ApiProperty({ description: '프로필 이미지 URL', required: false })
+    @ApiPropertyOptional({ description: '프로필 이미지 (파일 업로드)' })
     @IsOptional()
+    @IsString()
     profilePicture?: string;
 
     @ApiProperty({ description: '국적', example: 'Korea' })
@@ -31,6 +32,7 @@ export class RegisterUserDto {
         enum: UserRole,
         example: UserRole.CREATOR,
     })
-    @IsOptional()
+    @IsNotEmpty()
+    @IsEnum(UserRole)
     role?: UserRole;
 }

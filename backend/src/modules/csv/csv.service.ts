@@ -73,8 +73,6 @@ export class CsvService {
             const cleanKey = key.replace(/\ufeff/g, '').trim();
             normalizedData[cleanKey] = data[key]?.toString().replace(/\ufeff/g, '').trim();
         });
-        // 실제로 생성된 키들을 로그로 출력하여 CSV 헤더가 올바른지 확인합니다.
-        console.log('Normalized CSV Keys:', Object.keys(normalizedData));
         return normalizedData;
     }
 
@@ -87,7 +85,7 @@ export class CsvService {
             youtube: data['유튜브']?.trim() || null,
             instagram: data['인스타']?.trim() || null,
             tiktok: data['틱톡']?.trim() || null,
-            profilePicture: data['프로필사진']?.trim() || null,
+            profilePicture: data['프로필이미지']?.trim() || null,
         };
     }
 

@@ -4,11 +4,12 @@ import { Repository } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { RegisterUserDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
-import * as bcrypt from 'bcrypt';
 import { plainToInstance } from 'class-transformer';
 import { Request } from 'express';
 import { UserRole } from '../../users/enums/user-role.enum';
 import { AuthUserDto } from '../dto/auth-user-dto';
+import * as bcrypt from 'bcryptjs';  // ✅ `bcryptjs` 사용
+
 
 @Injectable()
 export class AuthService {

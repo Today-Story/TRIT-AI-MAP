@@ -1,22 +1,66 @@
-import { Controller, Post, Body, Req, Get } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {Controller, Post, Body, Req, Get, UploadedFile, UseInterceptors, BadRequestException} from '@nestjs/common';
+import {ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import { Request } from 'express';
 import { RegisterUserDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
 import { AuthService } from '../services/auth.service';
 import { AuthUserDto } from '../dto/auth-user-dto';
+import {S3Service} from "../../s3/s3.service";
+import {UserRole} from "../../users/enums/user-role.enum";
+import {FileInterceptor} from "@nestjs/platform-express";
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+      private readonly authService: AuthService,
+      private readonly s3Service: S3Service,
+  ) {}
 
-  @ApiOperation({ summary: '회원 가입', description: '사용자 역할은 선택 가능: CREATOR, BUSINESS, NORMAL, ADMIN)' })
+  @ApiOperation({ summary: '회원 가입' })
   @ApiResponse({ status: 201, description: '회원가입 완료', type: AuthUserDto })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', example: 'user@example.com' },
+        password: { type: 'string', example: 'password123' },
+        nickname: { type: 'string', example: '닉네임123' },
+        nationality: { type: 'string', example: 'Korea' },
+        role: {
+          type: 'string',
+          enum: Object.values(UserRole),
+          example: UserRole.CREATOR,
+        },
+        profilePicture: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @Post('signup')
-  async register(@Body() registerDto: RegisterUserDto, @Req() req: Request): Promise<AuthUserDto> {
+  @UseInterceptors(FileInterceptor('profilePicture'))
+  async register(
+      @Req() req: Request,
+      @Body() registerDto: RegisterUserDto,
+      @UploadedFile() file?: Express.Multer.File,
+  ): Promise<AuthUserDto> {
+
+    if (!registerDto) {
+      throw new BadRequestException('회원가입 데이터가 전달되지 않았습니다.');
+    }
+
+    if (file) {
+      registerDto.profilePicture = await this.s3Service.uploadFile(file, 'profile', 'creator');
+    }
+
     return this.authService.register(registerDto, req);
   }
+
+
+
 
   @ApiOperation({ summary: '로그인' })
   @ApiResponse({ status: 200, description: '로그인 완료', type: AuthUserDto })
