@@ -5,9 +5,17 @@ import { ProductsModule } from './modules/products/products.module';
 import { CsvModule} from "./modules/csv/csv.module";
 import {UsersModule} from "./modules/users/users.module";
 import { AuthModule } from './modules/auth/auth.module';
+import {ConfigModule} from "@nestjs/config";
+import { join } from 'path';
 
 @Module({
     imports: [
+        // ✅ .env 파일 로드 설정 추가
+        ConfigModule.forRoot({
+            isGlobal: true,
+            envFilePath: join(__dirname, '../../.env'), // ✅ 명확한 경로 설정
+        }),
+
         TypeOrmModule.forRoot({
             type: 'postgres',
             host: process.env.DB_HOST || 'localhost',

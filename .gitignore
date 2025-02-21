@@ -176,7 +176,7 @@ next-env.d.ts
 
 # Docker 관련
 docker-compose.override.yml
-backend/.env
+.env
 
 # PostgreSQL 데이터 디렉토리 (로컬 개발용 DB 데이터 무시)
 postgres-data/
