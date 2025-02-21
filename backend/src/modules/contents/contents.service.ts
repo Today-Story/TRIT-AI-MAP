@@ -1,78 +1,81 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {ILike, Like, Repository} from 'typeorm';
-import {Content, ContentCategory} from './content.entity';
+import { Repository, ILike } from 'typeorm';
+import { Content, ContentCategory } from './content.entity';
+import { ContentDto } from './contents.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class ContentsService {
     constructor(
         @InjectRepository(Content)
         private readonly contentRepository: Repository<Content>,
-    ) {
-    }
+    ) {}
 
     async saveContents(contents: any[]): Promise<void> {
         if (!contents.length) {
             console.log('저장할 데이터가 없습니다.');
             return;
         }
+        const validContents = contents.filter(item => item !== null);
+        if (validContents.length === 0) {
+            console.log('유효한 데이터가 없습니다.');
+            return;
+        }
         try {
-            console.log(`${contents.length}개의 데이터를 저장합니다.`);
-
-            // CSV 파일 순서대로 ID를 부여
-            contents.forEach((item, index) => {
-                item.id = index + 1;
-            });
-
-            await this.contentRepository.insert(contents);
-
+            console.log(`${validContents.length}개의 데이터를 저장합니다.`);
+            await this.contentRepository.insert(validContents);
             console.log('CSV 데이터 저장 완료.');
         } catch (error) {
-            console.log('데이터 저장 중 오류 발생:', error);
+            console.error('데이터 저장 중 오류 발생:', error);
         }
     }
 
-    //전체조회
-    async findAll(): Promise<Content[]> {
-        return await this.contentRepository.find();
+    // 전체 컨텐츠 조회 (user 관계 포함)
+    async findAll(): Promise<ContentDto[]> {
+        const contents = await this.contentRepository.find({ relations: ['user'] });
+        return plainToInstance(ContentDto, contents, { excludeExtraneousValues: true });
     }
 
-    // 특정 id로 조회
-    async findById(id:number): Promise<Content | null> {
-        return await this.contentRepository.findOne({where: {id}});
+    // ID로 컨텐츠 조회
+    async findById(id: number): Promise<ContentDto> {
+        const content = await this.contentRepository.findOne({ where: { id }, relations: ['user'] });
+        if (!content) {
+            throw new BadRequestException(`Content with id ${id} not found`);
+        }
+        return plainToInstance(ContentDto, content, { excludeExtraneousValues: true });
     }
 
-    //카테고리 조회
-    async findByCategory(category: string): Promise<Content[]> {
+    // 카테고리별 컨텐츠 조회
+    async findByCategory(category: string): Promise<ContentDto[]> {
         if (category === '전체' || category.toUpperCase() === 'ALL') {
-            return await this.contentRepository.find();
+            const contents = await this.contentRepository.find({ relations: ['user'] });
+            return plainToInstance(ContentDto, contents, { excludeExtraneousValues: true });
         }
-
         const decodedCategory = decodeURIComponent(category);
-
-        const categoryEnum = Object.values(ContentCategory).find(category => category === decodedCategory) as ContentCategory;
-
+        const categoryEnum = Object.values(ContentCategory).find(
+            cat => cat === decodedCategory
+        ) as ContentCategory;
         if (!categoryEnum) {
-            throw new Error(`잘못된 카테고리 값: ${decodedCategory}`);
+            throw new BadRequestException(`잘못된 카테고리 값: ${decodedCategory}`);
         }
-
-        return await this.contentRepository.find({
-            where: {category: categoryEnum},
+        const contents = await this.contentRepository.find({
+            where: { category: categoryEnum },
+            relations: ['user'],
         });
+        return plainToInstance(ContentDto, contents, { excludeExtraneousValues: true });
     }
 
     // 제목에 특정 키워드가 포함된 컨텐츠 검색
-    async searchByName(name: string): Promise<Content[]> {
-        // 입력값 검증 (빈 값일 경우 예외 처리)
+    async searchByName(name: string): Promise<ContentDto[]> {
         if (!name || name.trim() === '') {
-            throw new Error('검색어를 입력해주세요.');
+            throw new BadRequestException('검색어를 입력해주세요.');
         }
-
-        // 불필요한 공백 제거 후 검색
         const searchKeyword = name.trim();
-
-        return await this.contentRepository.find({
-            where: { title: ILike(`%${searchKeyword}%`) }, // ILike: 대소문자 구분 없이 검색
+        const contents = await this.contentRepository.find({
+            where: { title: ILike(`%${searchKeyword}%`) },
+            relations: ['user'],
         });
+        return plainToInstance(ContentDto, contents, { excludeExtraneousValues: true });
     }
 }
