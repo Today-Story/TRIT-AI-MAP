@@ -34,6 +34,7 @@ const MapPage = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  console.log(setSelectedCategory);
 
   const fetchContents = async () => {
     try {
