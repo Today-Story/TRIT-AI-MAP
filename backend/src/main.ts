@@ -23,7 +23,7 @@ async function bootstrap() {
           saveUninitialized: false,
           cookie: {
               maxAge: 3600000, // 예: 1시간
-              secure: false, // HTTPS 사용 시 true로 변경
+              secure: true, // HTTPS 사용 시 true로 변경
         },
       }),
   );
