@@ -67,6 +67,7 @@ interface HomeProps {
 export default function Home({ products, onClickViewMore }: HomeProps) {
   const onClickGetCoupon = (id: number) => {
     // TODO: GET Coupon API 연동
+    console.log(id);
   };
   return (
     <div className="py-3 space-y-5">
