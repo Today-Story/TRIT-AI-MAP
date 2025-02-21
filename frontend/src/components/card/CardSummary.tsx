@@ -4,6 +4,8 @@ import { ContentDTO } from "@services/contents";
 import { getDistanceFromLatLngInKm } from "@utils/map";
 
 import axios from "axios";
+import { AiFillInstagram } from "react-icons/ai";
+import { SiTiktok } from "react-icons/si";
 
 import { DrawerMode } from "./CardDrawer";
 import StarRating from "../StarRating";
@@ -15,10 +17,20 @@ interface CardSummaryProps {
   setDrawerMode: React.Dispatch<React.SetStateAction<DrawerMode>>;
 }
 
+const youtubeEmbedUrls = ["https://www.youtube.com/embed", "https://youtube.com/embed"];
+
 export default function CardSummary({ place, currentLocation, setDrawerMode }: CardSummaryProps) {
   const [address, setAddress] = useState({ name: "", distance: 0 });
 
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "YOUR_GOOGLE_MAP_API_KEY";
+
+  const checkYoutubeEmbedUrl = (url: string) => {
+    return youtubeEmbedUrls.some((embedUrl) => url.startsWith(embedUrl));
+  };
+
+  const onVideoClick = () => {
+    window.location.href = place?.url || "http://localhost:5173";
+  };
 
   useEffect(() => {
     if (!place) return;
@@ -49,16 +61,31 @@ export default function CardSummary({ place, currentLocation, setDrawerMode }: C
     fetchAddress();
   }, [place]);
 
+  console.log(place?.url);
+
   return place ? (
     <div className="shadow-md shadow-primary-200 bg-primary-100 rounded-3xl flex gap-2 p-3">
       <div className="flex items-center justify-center aspect-video-vertical w-1/3">
-        <iframe
-          src={place.url}
-          title="Video"
-          className="w-full h-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
-          onError={(e) => console.log(e)}
-        />
+        {checkYoutubeEmbedUrl(place.url) ? (
+          <iframe
+            src={place.url}
+            title="Video"
+            className="w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
+            onError={(e) => console.log(e)}
+          />
+        ) : (
+          <button
+            onClick={onVideoClick}
+            className="w-full h-full bg-primary-200 rounded-xl text-primary-300 flex justify-center items-center"
+          >
+            {place.url.includes("instagram") ? (
+              <AiFillInstagram size={40} />
+            ) : (
+              <SiTiktok size={40} />
+            )}
+          </button>
+        )}
       </div>
       <button
         onClick={() => setDrawerMode("detail")}
