@@ -1,4 +1,4 @@
-import { ProductCategory } from './products.entity';
+import { BusinessCategory } from './business.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ProductResponseDto {
@@ -11,8 +11,8 @@ export class ProductResponseDto {
     @ApiProperty({ description: '한글 카테고리명' })
     displayCategory: string; // 한글 카테고리
 
-    @ApiProperty({ description: '상품 카테고리 (ENUM 값)', enum: ProductCategory })
-    category: ProductCategory; // ENUM 그대로 유지
+    @ApiProperty({ description: '상품 카테고리 (ENUM 값)', enum: BusinessCategory })
+    category: BusinessCategory;
 
     @ApiProperty({ description: '가격' })
     price: string;

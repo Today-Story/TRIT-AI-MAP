@@ -1,5 +1,5 @@
 import 'express-session';
-import {UserRole} from "../modules/users/enums/user-role.enum";
+import {UserRole} from "../modules/users/enums/users-role.enum";
 
 declare module 'express-session' {
     interface SessionData {

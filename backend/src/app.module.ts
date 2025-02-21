@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContentsModule } from './modules/contents/contents.module';
-import { ProductsModule } from './modules/products/products.module';
+import { BusinessModule } from './modules/business/business.module';
 import { CsvModule} from "./modules/csv/csv.module";
-import {UsersModule} from "./modules/users/users.module";
+import {CreatorsModule} from "./modules/creators/creators.module";
 import { AuthModule } from './modules/auth/auth.module';
 import {ConfigModule} from "@nestjs/config";
 import { join } from 'path';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
     imports: [
@@ -27,11 +28,12 @@ import { join } from 'path';
             synchronize: true, // 개발 환경에서만 true (프로덕션 환경에서는 false)
             logging: ['error'],
         }),
-        UsersModule,
+        CreatorsModule,
         ContentsModule,
-        ProductsModule,
+        BusinessModule,
         CsvModule,
         AuthModule,
+        UsersModule,
     ],
 })
 export class AppModule {}

@@ -1,21 +1,21 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { UsersService } from '../services/users.service';
-import { UserDto } from '../dto/user.dto';
+import { CreatorsService } from '../services/creators.service';
+import { CreatorsDto } from '../dto/creators.dto';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('users')
-@Controller('users')
-export class UsersController {
-    constructor(private readonly userService: UsersService) {}
+@ApiTags('creators')
+@Controller('creators')
+export class CreatorsController {
+    constructor(private readonly userService: CreatorsService) {}
 
     @ApiOperation({ summary: '크리에이터 전체 조회' })
     @ApiResponse({
         status: 200,
         description: '전체 크리에이터 목록을 반환합니다.',
-        type: [UserDto],
+        type: [CreatorsDto],
     })
-    @Get('/creators')
-    async getAllCreators(): Promise<UserDto[]> {
+    @Get('')
+    async getAllCreators(): Promise<CreatorsDto[]> {
         return this.userService.findAllCreators();
     }
 
@@ -28,10 +28,10 @@ export class UsersController {
     @ApiResponse({
         status: 200,
         description: '특정 크리에이터가 작성한 콘텐츠를 반환합니다.',
-        type: UserDto,
+        type: CreatorsDto,
     })
-    @Get('/creators/:id')
-    async getCreatorContents(@Param('id') id: number): Promise<UserDto | null> {
+    @Get('/:id')
+    async getCreatorContents(@Param('id') id: number): Promise<CreatorsDto | null> {
         return this.userService.findCreatorByIdWithContents(id);
     }
 }

@@ -1,4 +1,4 @@
-// user-role.enum.ts
+// users-role.enum.ts
 export enum UserRole {
     CREATOR = 'CREATOR',
     BUSINESS = 'BUSINESS',
