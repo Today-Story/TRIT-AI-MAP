@@ -1,4 +1,6 @@
 import StarRating from "@components/StarRating";
+import { ProductDTO } from "@services/products";
+import { formatPrice } from "@utils/price";
 
 import { MdArrowForward } from "react-icons/md";
 
@@ -58,10 +60,11 @@ const bookItems = [
 ];
 
 interface HomeProps {
+  products: ProductDTO[];
   onClickViewMore: (menu: string) => void;
 }
 
-export default function Home({ onClickViewMore }: HomeProps) {
+export default function Home({ products, onClickViewMore }: HomeProps) {
   const onClickGetCoupon = (id: number) => {
     // TODO: GET Coupon API 연동
   };
@@ -106,30 +109,16 @@ export default function Home({ onClickViewMore }: HomeProps) {
           </button>
         </div>
         <div className="flex gap-2 overflow-x-auto relative">
-          <div className="w-2/5 shrink-0 gap-2">
-            <div className="w-full bg-gray-200 aspect-square" />
-            <div className="bg-primary-100 p-2">
-              <p className="font-semibold">PRODUCT</p>
-              <StarRating small rating={4.5} />
-              <p className="text-primary-300">$99.00</p>
+          {products.map((product) => (
+            <div key={product.id} className="w-2/5 shrink-0 gap-2">
+              <div className="w-full bg-gray-200 aspect-square" />
+              <div className="bg-primary-100 p-2">
+                <p className="font-semibold">{product.name}</p>
+                <StarRating small rating={4.5} />
+                <p className="text-primary-300">{formatPrice(product.price)}</p>
+              </div>
             </div>
-          </div>
-          <div className="w-2/5 shrink-0 gap-2">
-            <div className="w-full bg-gray-200 aspect-square" />
-            <div className="bg-primary-100 p-2">
-              <p className="font-semibold">PRODUCT</p>
-              <StarRating small rating={4.5} />
-              <p className="text-primary-300">$99.00</p>
-            </div>
-          </div>
-          <div className="w-2/5 shrink-0 gap-2">
-            <div className="w-full bg-gray-200 aspect-square" />
-            <div className="bg-primary-100 p-2">
-              <p className="font-semibold">PRODUCT</p>
-              <StarRating small rating={4.5} />
-              <p className="text-primary-300">$99.00</p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
       <div className="space-y-1">
