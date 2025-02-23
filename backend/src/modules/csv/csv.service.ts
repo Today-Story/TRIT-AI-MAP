@@ -3,27 +3,27 @@ import * as fs from 'fs';
 import * as csvParser from 'csv-parser';
 import * as path from 'path';
 import { ContentCategory } from '../contents/content.entity';
-import { ProductCategory } from '../products/products.entity';
+import { BusinessCategory } from '../business/business.entity';
 import {InjectRepository} from "@nestjs/typeorm";
-import {User} from "../users/entities/user.entity";
 import {Repository} from "typeorm";
+import {Creators} from "../creators/entities/creators.entity";
 
 @Injectable()
 export class CsvService {
     constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
+        @InjectRepository(Creators)
+        private readonly creatorRepository: Repository<Creators>,
     ) {}
 
     // 중복 생성 방지를 위한 promise 캐시
-    private userCreationPromises: Map<string, Promise<User>> = new Map();
+    private userCreationPromises: Map<string, Promise<Creators>> = new Map();
 
     async readUserCsv(): Promise<any[]> {
-        return this.readCsvFile('user.csv', this.formatUserData.bind(this));
+        return this.readCsvFile('user.csv', this.formatCreatorData.bind(this));
     }
 
     async readContentCsv(): Promise<any[]> {
-        const users = await this.userRepository.find();
+        const users = await this.creatorRepository.find();
         const userMap = new Map(users.map(user => [user.userId.trim().toLowerCase(), user]));
 
         return this.readCsvFile('content.csv', (data) => this.formatContentData(data, userMap));
@@ -31,7 +31,7 @@ export class CsvService {
 
 
     async readProductCsv(): Promise<any[]> {
-        return this.readCsvFile('product.csv', this.formatProductData.bind(this));
+        return this.readCsvFile('product.csv', this.formatBusinessData.bind(this));
     }
 
     private async readCsvFile(filename: string, formatter: (data: any) => Promise<any>): Promise<any[]> {
@@ -77,7 +77,7 @@ export class CsvService {
     }
 
 
-    private formatUserData(data: any) {
+    private formatCreatorData(data: any) {
         return {
             userId: data['트릿아이디']?.trim(),
             nickname: data['활동명(닉네임)']?.trim() || '',
@@ -89,7 +89,7 @@ export class CsvService {
         };
     }
 
-    private async formatContentData(data: any, userMap: Map<string, User>): Promise<any> {
+    private async formatContentData(data: any, userMap: Map<string, Creators>): Promise<any> {
         // 게시물 번호 검증
         if (!data['게시물 번호'] || data['게시물 번호'].trim() === '') {
             console.warn('게시물 번호 값이 누락되어 건너뜁니다:', data);
@@ -118,9 +118,9 @@ export class CsvService {
                 user = await this.userCreationPromises.get(keyLower);
             } else {
                 const creationPromise = (async () => {
-                    let existingUser = await this.userRepository.findOne({ where: { userId: userKeyRaw } });
+                    let existingUser = await this.creatorRepository.findOne({ where: { userId: userKeyRaw } });
                     if (!existingUser) {
-                        const newUser = this.userRepository.create({
+                        const newUser = this.creatorRepository.create({
                             userId: userKeyRaw,
                             nickname: data['작성자']?.trim(),
                             category: '',
@@ -129,7 +129,7 @@ export class CsvService {
                             tiktok: null,
                             profilePicture: null,
                         });
-                        existingUser = await this.userRepository.save(newUser);
+                        existingUser = await this.creatorRepository.save(newUser);
                     }
                     return existingUser;
                 })();
@@ -177,10 +177,10 @@ export class CsvService {
         return isNaN(numValue) ? null : numValue;
     }
 
-    private formatProductData(data: any) {
+    private formatBusinessData(data: any) {
         return {
             name: data['서비스명']?.trim() || null,
-            category: this.mapProductCategory(data['카테고리']),
+            category: this.mapBusinessCategory(data['카테고리']),
             price: data['서비스가']?.trim() || null,
             company: data['회사명']?.trim() || null,
             contactPerson: data['담당자']?.trim() || null,
@@ -206,15 +206,15 @@ export class CsvService {
         return upperCategory as ContentCategory;
     }
 
-    private mapProductCategory(category: string | undefined): ProductCategory {
-        if (!category || category.trim() === '') return ProductCategory.ALL;
+    private mapBusinessCategory(category: string | undefined): BusinessCategory {
+        if (!category || category.trim() === '') return BusinessCategory.ALL;
 
         const upperCategory = category.trim();
 
-        if (!Object.values(ProductCategory).includes(upperCategory as ProductCategory)) {
+        if (!Object.values(BusinessCategory).includes(upperCategory as BusinessCategory)) {
             throw new Error(`잘못된 카테고리 값: ${upperCategory}`);
         }
-        return upperCategory as ProductCategory;
+        return upperCategory as BusinessCategory;
     }
 
     private formatLocation(location: string | undefined): string | null {

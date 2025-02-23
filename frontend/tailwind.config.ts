@@ -10,12 +10,23 @@ export default {
           300: "#007FFF",
         },
         placeholder: "#A6D6F4",
+        "dark-blue": "#254685",
       },
       maxWidth: {
         mobile: "450px",
       },
+      maxHeight: {
+        drawer: "80vh",
+      },
       screens: {
         mobile: "450px",
+      },
+      aspectRatio: {
+        "video-vertical": "9 / 16",
+        "hide-card": "5 / 6",
+      },
+      fontSize: {
+        xxs: "0.625rem",
       },
     },
   },
