@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query, BadRequestException } from '@nestjs/common';
 import { BusinessService } from "./business.service";
 import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiQuery } from '@nestjs/swagger';
-import {Business, BusinessCategory} from "./business.entity";
+import {Business, BusinessCategory} from "./entities/business.entity";
 
 @ApiTags('business')
 @Controller('business')

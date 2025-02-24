@@ -1,6 +1,6 @@
 // content.dto.ts
 import { Expose } from 'class-transformer';
-import { ContentCategory } from './content.entity';
+import {ContentCategory} from "./content.entity";
 
 export class ContentDto {
     // DB의 id 필드를 contentId로 노출합니다.

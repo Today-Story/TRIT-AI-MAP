@@ -23,15 +23,17 @@ export class S3Service {
     async uploadFile(
         file: Express.Multer.File,
         category: 'profile',
-        userType?: 'creator'
+        userType?: 'creator' | 'company' | 'normal'
     ): Promise<string> {
-        // 카테고리별 S3 폴더 경로 매핑
+        // 폴더 매핑: userType에 따라 폴더 경로를 지정
         const folderMap: Record<string, string> = {
             'profile_creator': 'profiles/creator',
+            'profile_company': 'profiles/company',
+            'profile_normal': 'profiles/normal',
         };
 
-        // 폴더 경로 설정 (기본값 추가)
-        const folderPath = userType ? folderMap[`${category}_${userType}`] || 'profiles/others' : folderMap[category] || 'profiles/others';
+        const keyPrefix = userType ? `profile_${userType}` : 'profile_user';
+        const folderPath = folderMap[keyPrefix] || 'profiles/others';
 
         // 파일 확장자 추출 (.jpeg, .png 등)
         const extension = path.extname(file.originalname);

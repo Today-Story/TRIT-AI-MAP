@@ -1,13 +1,16 @@
-import {Controller, Post, Body, Req, Get, UploadedFile, UseInterceptors, BadRequestException} from '@nestjs/common';
-import {ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import { Request } from 'express';
-import { RegisterUserDto } from '../dto/register.dto';
-import { LoginDto } from '../dto/login.dto';
 import { AuthService } from '../services/auth.service';
-import { AuthUserDto } from '../dto/auth-user-dto';
-import {S3Service} from "../../s3/s3.service";
+import { S3Service } from '../../../common/s3/s3.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { User } from '../../users/user.entity';
+import { AuthUserDto } from '../dto/auth-user.dto';
+import { CreatorSignupDto } from '../dto/singup/creator-signup.dto';
+import { CompanySignupDto } from '../dto/singup/company-signup.dto';
+import { ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { BadRequestException, Body, Controller, Get, Post, Req, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { LoginDto } from "../dto/login.dto";
+import { NomalSinupDto } from "../dto/singup/nomal-sinup.dto";
 import {UserRole} from "../../users/enums/users-role.enum";
-import {FileInterceptor} from "@nestjs/platform-express";
 
 @ApiTags('auth')
 @Controller('auth')
@@ -17,67 +20,149 @@ export class AuthController {
       private readonly s3Service: S3Service,
   ) {}
 
-  @ApiOperation({ summary: '회원 가입' })
-  @ApiResponse({ status: 201, description: '회원가입 완료', type: AuthUserDto })
+  @Post('signup/creator')
+  @ApiOperation({ summary: '크리에이터 회원가입', description: '크리에이터 회원가입' })
   @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('profileImage'))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', example: 'creator@example.com' },
+        password: { type: 'string', example: 'password123' },
+        nickname: { type: 'string', example: '크리에이터닉네임' },
+        gender: { type: 'string', example: 'MAN' },
+        birthday: { type: 'string', format: 'date', example: '1990-01-01' },
+        phoneNumber: { type: 'string', example: '010-1234-5678' },
+        address: { type: 'string', example: 'Seoul, Korea' },
+        nationality: { type: 'string', example: 'Korea' },
+        introduction: { type: 'string', example: '안녕하세요, 크리에이터입니다.' },
+        youtube: { type: 'string', example: 'https://www.youtube.com/@channel' },
+        instagram: { type: 'string', example: 'https://www.instagram.com/username' },
+        tiktok: { type: 'string', example: 'https://www.tiktok.com/@username' },
+        category: { type: 'string', example: 'TRAVEL' },
+        profileImage: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  async registerCreator(
+      @UploadedFile() file: Express.Multer.File,
+      @Body() dto: CreatorSignupDto,
+      @Req() req: Request,
+  ): Promise<User> {
+    if (file) {
+      dto.profileImage = await this.s3Service.uploadFile(file, 'profile', 'creator');
+    }
+
+    const user = await this.authService.registerCreator(dto, UserRole.CREATOR);
+    req.session.userId = user.id;
+    req.session.userRole = user.role;
+    return user;
+  }
+
+  @Post('signup/company')
+  @ApiOperation({ summary: '기업 회원가입', description: '기업 회원가입' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('profileImage'))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', example: 'company@example.com' },
+        password: { type: 'string', example: 'password123' },
+        nickname: { type: 'string', example: '기업닉네임' },
+        gender: { type: 'string', example: 'WOMAN' },
+        birthday: { type: 'string', format: 'date', example: '1995-05-05' },
+        phoneNumber: { type: 'string', example: '010-9876-5432' },
+        address: { type: 'string', example: 'Seoul, Korea' },
+        nationality: { type: 'string', example: 'Korea' },
+        companyName: { type: 'string', example: 'ABC 회사' },
+        companySns: { type: 'string', example: 'https://www.instagram.com/company' },
+        introduction: { type: 'string', example: '우리 회사는 ...' },
+        category: { type: 'string', example: 'BEAUTY' },
+        profileImage: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  async registerCompany(
+      @UploadedFile() file: Express.Multer.File,
+      @Body() dto: CompanySignupDto,
+      @Req() req: Request,
+  ): Promise<User> {
+    if (file) {
+      dto.profileImage = await this.s3Service.uploadFile(file, 'profile', 'company');
+    }
+
+    const user = await this.authService.registerCompany(dto, UserRole.BUSINESS);
+    req.session.userId = user.id;
+    req.session.userRole = user.role;
+    return user;
+  }
+
+  @Post('signup/user')
+  @ApiOperation({ summary: '일반 회원가입', description: '일반 회원가입' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('profileImage'))
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
         email: { type: 'string', example: 'user@example.com' },
         password: { type: 'string', example: 'password123' },
-        nickname: { type: 'string', example: '닉네임123' },
+        nickname: { type: 'string', example: '일반닉네임' },
+        gender: { type: 'string', example: 'WOMAN' },
+        birthday: { type: 'string', format: 'date', example: '1995-05-05' },
+        phoneNumber: { type: 'string', example: '010-9876-5432' },
+        address: { type: 'string', example: 'Busan, Korea' },
         nationality: { type: 'string', example: 'Korea' },
-        role: {
-          type: 'string',
-          enum: Object.values(UserRole),
-          example: UserRole.CREATOR,
-        },
-        profilePicture: {
-          type: 'string',
-          format: 'binary',
-        },
+        profileImage: { type: 'string', format: 'binary' },
       },
     },
   })
-  @Post('signup')
-  @UseInterceptors(FileInterceptor('profilePicture'))
-  async register(
+  async registerNormalUser(
+      @UploadedFile() file: Express.Multer.File,
+      @Body() dto: NomalSinupDto,
       @Req() req: Request,
-      @Body() registerDto: RegisterUserDto,
-      @UploadedFile() file?: Express.Multer.File,
-  ): Promise<AuthUserDto> {
-
-    if (!registerDto) {
-      throw new BadRequestException('회원가입 데이터가 전달되지 않았습니다.');
-    }
-
+  ): Promise<User> {
     if (file) {
-      registerDto.profilePicture = await this.s3Service.uploadFile(file, 'profile', 'creator');
+      dto.profileImage = await this.s3Service.uploadFile(file, 'profile', 'normal');
     }
 
-    return this.authService.register(registerDto, req);
+    const user = await this.authService.registerNormalUser(dto, UserRole.NORMAL);
+    req.session.userId = user.id;
+    req.session.userRole = user.role;
+    return user;
   }
 
 
-
-
-  @ApiOperation({ summary: '로그인' })
-  @ApiResponse({ status: 200, description: '로그인 완료', type: AuthUserDto })
   @Post('login')
-  async login(@Body() loginDto: LoginDto, @Req() req: Request): Promise<AuthUserDto> {
-    return this.authService.login(loginDto, req);
+  @ApiOperation({
+    summary: '로그인',
+    description: '이메일과 비밀번호를 이용하여 로그인하고 세션을 생성합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '로그인 성공',
+    type: AuthUserDto,
+  })
+  async login(
+      @Body() loginDto: LoginDto,
+      @Req() req: Request,
+  ): Promise<AuthUserDto> {
+    const authUser = await this.authService.login(loginDto, req);
+    return authUser;
   }
 
-  @ApiOperation({ summary: '현재 로그인된 사용자 정보 조회' })
+  @Get('session')
+  @ApiOperation({
+    summary: '세션 조회',
+    description: '현재 로그인된 사용자의 세션 정보를 조회합니다.',
+  })
   @ApiResponse({
     status: 200,
     description: '현재 로그인된 사용자 정보',
     schema: {
-      example: {
-        userId: 1,
-        role: 'CREATOR',
-      },
+      example: { userId: 1, role: 'CREATOR' },
     },
   })
   @ApiResponse({
@@ -87,7 +172,6 @@ export class AuthController {
       example: { message: '로그인 상태가 아닙니다.' },
     },
   })
-  @Get('session')
   getSession(@Req() req: Request) {
     if (!req.session.userId) {
       return { message: '로그인 상태가 아닙니다.' };
@@ -95,21 +179,23 @@ export class AuthController {
     return { userId: req.session.userId, role: req.session.userRole };
   }
 
-  @ApiOperation({ summary: '로그아웃' })
+  @Post('logout')
+  @ApiOperation({
+    summary: '로그아웃',
+    description: '세션을 종료하여 로그아웃합니다.',
+  })
   @ApiResponse({
     status: 200,
-    description: '로그아웃 성공',
+    description: '로그아웃 완료',
     schema: { example: { message: '로그아웃 완료' } },
   })
-  @Post('logout')
   async logout(@Req() req: Request) {
     return new Promise((resolve, reject) => {
       req.session.destroy((err) => {
         if (err) {
-          reject(new Error('로그아웃 실패'));
-        } else {
-          resolve({ message: '로그아웃 완료' });
+          return reject(new BadRequestException('로그아웃 실패'));
         }
+        resolve({ message: '로그아웃 완료' });
       });
     });
   }
