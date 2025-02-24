@@ -1,13 +1,7 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from 'typeorm';
-import {Creators} from "../creators/entities/creators.entity";
+import {Category} from "../../common/enum/category.enum";
+import {User} from "../users/user.entity";
 
-export enum ContentCategory {
-    SHOPPING = 'SHOPPING',
-    TRAVEL = 'TRAVEL',
-    BEAUTY = 'BEAUTY',
-    FOOD = 'FOOD',
-    ALL = 'ALL',
-}
 
 @Entity()
 export class Content {
@@ -34,10 +28,10 @@ export class Content {
 
     @Column({
         type: 'enum',
-        enum: ContentCategory,
+        enum: Category,
         nullable: false,
     })
-    category: ContentCategory;
+    category: Category;
 
     @Column({ type: 'text', nullable: true })
     location: string;
@@ -51,7 +45,8 @@ export class Content {
     @Column({ type: 'simple-array', nullable: true })
     hashtags: string[];
 
-    @ManyToOne(() => Creators, (user) => user.contents, {onDelete: 'CASCADE'})
-    @JoinColumn({ name: 'userId'})
-    user: Creators;
+    @ManyToOne(() => User, (user) => user.contents, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'userId' })
+    user: User;
+
 }

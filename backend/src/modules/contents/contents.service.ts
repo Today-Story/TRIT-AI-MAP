@@ -1,9 +1,10 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
-import { Content, ContentCategory } from './content.entity';
+import { Content } from './content.entity';
 import { ContentDto } from './contents.dto';
 import { plainToInstance } from 'class-transformer';
+import {Category} from "../../common/enum/category.enum";
 
 @Injectable()
 export class ContentsService {
@@ -31,7 +32,7 @@ export class ContentsService {
         }
     }
 
-    // 전체 컨텐츠 조회 (user 관계 포함)
+    // 전체 컨텐츠 조회
     async findAll(): Promise<ContentDto[]> {
         const contents = await this.contentRepository.find({ relations: ['user'] });
         return plainToInstance(ContentDto, contents, { excludeExtraneousValues: true });
@@ -53,9 +54,9 @@ export class ContentsService {
             return plainToInstance(ContentDto, contents, { excludeExtraneousValues: true });
         }
         const decodedCategory = decodeURIComponent(category);
-        const categoryEnum = Object.values(ContentCategory).find(
+        const categoryEnum = Object.values(Category).find(
             cat => cat === decodedCategory
-        ) as ContentCategory;
+        ) as Category;
         if (!categoryEnum) {
             throw new BadRequestException(`잘못된 카테고리 값: ${decodedCategory}`);
         }

@@ -4,12 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {CsvService} from "../csv/csv.service";
 import { CsvModule} from "../csv/csv.module";
 import { BusinessController} from "./business.controller";
-import {Business} from "./business.entity";
+import {Business} from "./entities/business.entity";
+import {Creator} from "../creators/entities/creators.entity";
+import {User} from "../users/user.entity";
 
 
 @Module({
   imports: [
-      TypeOrmModule.forFeature([Business]),
+      TypeOrmModule.forFeature([Business, Creator, User]),
       CsvModule,
   ],
   controllers: [BusinessController],

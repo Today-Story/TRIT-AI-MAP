@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query, BadRequestException } from '@nestjs/comm
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ContentsService } from './contents.service';
 import { ContentDto } from './contents.dto';
-import { ContentCategory } from './content.entity';
+import {Category} from "../../common/enum/category.enum";
 
 @ApiTags('contents')
 @Controller('contents')
@@ -39,7 +39,7 @@ export class ContentsController {
     }
 
     @ApiOperation({ summary: '카테고리별 컨텐츠 조회', description: '특정 카테고리의 컨텐츠를 조회합니다.' })
-    @ApiParam({ name: 'category', enum: ContentCategory, description: '컨텐츠 카테고리' })
+    @ApiParam({ name: 'category', enum: Category, description: '컨텐츠 카테고리' })
     @ApiResponse({ status: 200, description: '해당 카테고리의 컨텐츠 리스트 반환', type: [ContentDto] })
     @Get('category/:category')
     async getContentsByCategory(@Param('category') category: string): Promise<ContentDto[]> {

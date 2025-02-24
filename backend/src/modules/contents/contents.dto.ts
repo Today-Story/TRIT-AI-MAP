@@ -1,6 +1,6 @@
 // content.dto.ts
 import { Expose } from 'class-transformer';
-import { ContentCategory } from './content.entity';
+import {Category} from "../../common/enum/category.enum";
 
 export class ContentDto {
     // DB의 id 필드를 contentId로 노출합니다.
@@ -26,7 +26,7 @@ export class ContentDto {
     likes: number;
 
     @Expose()
-    category: ContentCategory;
+    category: Category;
 
     @Expose()
     location: string;

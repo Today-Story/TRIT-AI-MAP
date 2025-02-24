@@ -1,16 +1,15 @@
-// creators/creators.dto.ts
+// src/creators/creator.dto.ts
 import { Expose, Type } from 'class-transformer';
-import {ContentDto} from "../../contents/contents.dto";
+import { ContentDto } from '../../contents/contents.dto';
+import {UserDto} from "../../users/user.dto";
 
 export class CreatorsDto {
     @Expose()
     id: number;
 
     @Expose()
-    userId: string;
-
-    @Expose()
-    nickname: string;
+    @Type(() => UserDto)
+    user: UserDto;
 
     @Expose()
     category: string;
@@ -27,7 +26,6 @@ export class CreatorsDto {
     @Expose()
     profilePicture: string;
 
-    // 관계된 콘텐츠들을 ContentDto로 매핑
     @Expose()
     @Type(() => ContentDto)
     contents: ContentDto[];
