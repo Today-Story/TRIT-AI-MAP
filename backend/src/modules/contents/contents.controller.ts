@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query, BadRequestException } from '@nestjs/comm
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ContentsService } from './contents.service';
 import { ContentDto } from './contents.dto';
-import { ContentCategory } from './content.entity';
+import {ContentCategory} from "./content.entity";
 
 @ApiTags('contents')
 @Controller('contents')

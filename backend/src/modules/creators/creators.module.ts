@@ -3,10 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CreatorsController } from './controller/creators.controller';
 import { CreatorsService } from './services/creators.service';
 import {CsvService} from "../csv/csv.service";
-import {Creators} from "./entities/creators.entity";
+import {Creator} from "./entities/creators.entity";
+import {User} from "../users/user.entity";
+import {Business} from "../business/entities/business.entity";
+import {Content} from "../contents/content.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Creators])],
+  imports: [TypeOrmModule.forFeature([Creator, User, Business, Content])],
   controllers: [CreatorsController],
   providers: [CreatorsService, CsvService],
   exports: [TypeOrmModule, CreatorsService],

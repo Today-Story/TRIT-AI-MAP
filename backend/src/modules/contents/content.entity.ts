@@ -1,5 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from 'typeorm';
-import {Creators} from "../creators/entities/creators.entity";
+import {User} from "../users/user.entity";
+
 
 export enum ContentCategory {
     SHOPPING = 'SHOPPING',
@@ -51,7 +52,8 @@ export class Content {
     @Column({ type: 'simple-array', nullable: true })
     hashtags: string[];
 
-    @ManyToOne(() => Creators, (user) => user.contents, {onDelete: 'CASCADE'})
-    @JoinColumn({ name: 'userId'})
-    user: Creators;
+    @ManyToOne(() => User, (user) => user.contents, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'userId' })
+    user: User;
+
 }

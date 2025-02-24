@@ -1,49 +1,34 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany,} from "typeorm";
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn,} from "typeorm";
 import {Content} from "../../contents/content.entity";
-import {UserRole} from "../../users/enums/users-role.enum";
+import {User} from "../../users/user.entity";
+
+
 
 @Entity()
-export class Creators {
+export class Creator {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'varchar', length:255, unique: true})
-    userId: string;
+    @OneToOne(() => User)
+    @JoinColumn()
+    user: User;
 
-    @Column({ type: 'varchar', length: 255})
-    nickname: string;
-
-    @Column({type: 'varchar', length: 255, nullable: true})
+    @Column({ type: 'varchar', length: 255, nullable: true })
     category: string;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
-    youtube: string;  // 유튜브 URL
+    youtube: string;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
-    instagram: string;  // 인스타그램 URL
+    instagram: string;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
-    tiktok: string;  // 틱톡 URL
+    tiktok: string;
 
-    @Column({ type: 'varchar', length: 255, nullable: true })
-    profilePicture: string;
+    @Column({ type: 'varchar', length: 500, nullable: true })
+    introduction: string;
 
     @OneToMany(() => Content, (content) => content.user)
     contents: Content[];
-
-    @Column({ type: 'varchar', nullable: true})
-    password: string;
-
-    //국적
-    @Column({type:'varchar', nullable: true})
-    nationality: string;
-
-    //회원가입 분류 enum
-    @Column({
-        type: 'enum',
-        enum: UserRole,
-        default: UserRole.NORMAL,
-    })
-    role: UserRole;
 
 }
