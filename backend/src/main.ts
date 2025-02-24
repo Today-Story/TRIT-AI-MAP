@@ -10,7 +10,7 @@ async function bootstrap() {
   app.enableCors({
       origin: ['https://trit.framer.ai', 'http://localhost:5173'],
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-      allowedHeaders: '*',
+      allowedHeaders: 'Content-Type, Authorization', // '*' 대신 명시적으로 설정
       credentials: true, // 쿠키/인증 정보를 포함한 요청 허용
   });
 
