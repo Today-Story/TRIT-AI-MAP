@@ -7,12 +7,11 @@ import * as session from 'express-session';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {});
 
-  // 모든 도메인에서의 CORS 허용
   app.enableCors({
-    origin: 'https://trit.framer.ai', // 모든 출처 허용
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // 허용할 HTTP 메서드
-    allowedHeaders: '*', // 모든 헤더 허용
-    credentials: true, // 쿠키/인증 정보를 포함한 요청 허용
+      origin: ['https://trit.framer.ai', 'http://localhost:5173'],
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      allowedHeaders: '*',
+      credentials: true, // 쿠키/인증 정보를 포함한 요청 허용
   });
 
   // 세션 미들웨어 추가
