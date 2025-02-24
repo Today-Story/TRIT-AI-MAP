@@ -31,7 +31,7 @@ export class CreatorsController {
         type: CreatorsDto,
     })
     @Get('/:id')
-    async getCreatorContents(@Param('id') id: number): Promise<CreatorsDto | null> {
+    async getCreatorContents(@Param('id') id: number): Promise<CreatorsDto> {
         return this.userService.findCreatorByIdWithContents(id);
     }
 }

@@ -5,9 +5,11 @@ import { CreatorsService } from './services/creators.service';
 import {CsvService} from "../csv/csv.service";
 import {Creator} from "./entities/creators.entity";
 import {User} from "../users/user.entity";
+import {Business} from "../business/entities/business.entity";
+import {Content} from "../contents/content.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Creator, User])],
+  imports: [TypeOrmModule.forFeature([Creator, User, Business, Content])],
   controllers: [CreatorsController],
   providers: [CreatorsService, CsvService],
   exports: [TypeOrmModule, CreatorsService],

@@ -56,7 +56,10 @@ export class CreatorsService {
             relations: ['user'],
             where: { user: { role: UserRole.CREATOR } },
         });
-        return plainToInstance(CreatorsDto, creators, { excludeExtraneousValues: true });
+
+        const validCreators = creators.filter(creator => creator.user);
+
+        return validCreators.map(creator => new CreatorsDto(creator));
     }
 
     async findCreatorByIdWithContents(id: number): Promise<CreatorsDto> {
@@ -65,10 +68,10 @@ export class CreatorsService {
             relations: ['user', 'contents'],
         });
 
-        if (!creator) {
+        if (!creator || !creator.user) {
             throw new NotFoundException(`ID ${id}에 해당하는 크리에이터를 찾을 수 없습니다.`);
         }
 
-        return plainToInstance(CreatorsDto, creator, { excludeExtraneousValues: true });
+        return new CreatorsDto(creator);
     }
 }

@@ -1,4 +1,3 @@
-
 import { Request } from 'express';
 import { AuthService } from '../services/auth.service';
 import { S3Service } from '../../../common/s3/s3.service';
@@ -7,10 +6,11 @@ import { User } from '../../users/user.entity';
 import { AuthUserDto } from '../dto/auth-user.dto';
 import { CreatorSignupDto } from '../dto/singup/creator-signup.dto';
 import { CompanySignupDto } from '../dto/singup/company-signup.dto';
-import {ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
-import {BadRequestException, Body, Controller, Get, Post, Req, UploadedFile, UseInterceptors} from "@nestjs/common";
-import {LoginDto} from "../dto/login.dto";
-import {NomalSinupDto} from "../dto/singup/nomal-sinup.dto"; // 일반회원가입 DTO
+import { ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { BadRequestException, Body, Controller, Get, Post, Req, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { LoginDto } from "../dto/login.dto";
+import { NomalSinupDto } from "../dto/singup/nomal-sinup.dto";
+import {UserRole} from "../../users/enums/users-role.enum";
 
 @ApiTags('auth')
 @Controller('auth')
@@ -20,14 +20,10 @@ export class AuthController {
       private readonly s3Service: S3Service,
   ) {}
 
-
   @Post('signup/creator')
-  @ApiOperation({
-    summary: '크리에이터 회원가입',
-    description:
-        '크리에이터 회원가입을 진행합니다.',
-  })
+  @ApiOperation({ summary: '크리에이터 회원가입', description: '크리에이터 회원가입' })
   @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('profileImage'))
   @ApiBody({
     schema: {
       type: 'object',
@@ -40,53 +36,34 @@ export class AuthController {
         phoneNumber: { type: 'string', example: '010-1234-5678' },
         address: { type: 'string', example: 'Seoul, Korea' },
         nationality: { type: 'string', example: 'Korea' },
+        introduction: { type: 'string', example: '안녕하세요, 크리에이터입니다.' },
+        youtube: { type: 'string', example: 'https://www.youtube.com/@channel' },
+        instagram: { type: 'string', example: 'https://www.instagram.com/username' },
+        tiktok: { type: 'string', example: 'https://www.tiktok.com/@username' },
+        category: { type: 'string', example: 'TRAVEL' },
         profileImage: { type: 'string', format: 'binary' },
-        introduction: {
-          type: 'string',
-          example: '안녕하세요, 영상 제작자입니다.',
-        },
-        category: {
-          type: 'string',
-          enum: ['SHOPPING', 'TRAVEL', 'BEAUTY', 'FOOD'],
-          example: 'TRAVEL',
-        },
-        youtube: {
-          type: 'string',
-          example: 'https://www.youtube.com/@channel',
-        },
-        instagram: {
-          type: 'string',
-          example: 'https://www.instagram.com/username',
-        },
-        tiktok: {
-          type: 'string',
-          example: 'https://www.tiktok.com/@username',
-        },
       },
     },
   })
-  @UseInterceptors(FileInterceptor('profileImage'))
   async registerCreator(
-      @Body() dto: CreatorSignupDto,
       @UploadedFile() file: Express.Multer.File,
+      @Body() dto: CreatorSignupDto,
       @Req() req: Request,
   ): Promise<User> {
     if (file) {
       dto.profileImage = await this.s3Service.uploadFile(file, 'profile', 'creator');
     }
-    const user = await this.authService.registerCreator(dto);
+
+    const user = await this.authService.registerCreator(dto, UserRole.CREATOR);
     req.session.userId = user.id;
     req.session.userRole = user.role;
     return user;
   }
 
-
   @Post('signup/company')
-  @ApiOperation({
-    summary: '기업 회원가입',
-    description:
-        '기업 회원가입을 진행합니다.'})
+  @ApiOperation({ summary: '기업 회원가입', description: '기업 회원가입' })
   @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('profileImage'))
   @ApiBody({
     schema: {
       type: 'object',
@@ -94,45 +71,38 @@ export class AuthController {
         email: { type: 'string', example: 'company@example.com' },
         password: { type: 'string', example: 'password123' },
         nickname: { type: 'string', example: '기업닉네임' },
+        gender: { type: 'string', example: 'WOMAN' },
+        birthday: { type: 'string', format: 'date', example: '1995-05-05' },
+        phoneNumber: { type: 'string', example: '010-9876-5432' },
         address: { type: 'string', example: 'Seoul, Korea' },
         nationality: { type: 'string', example: 'Korea' },
-        profileImage: { type: 'string', format: 'binary' },
         companyName: { type: 'string', example: 'ABC 회사' },
-        companySns: {
-          type: 'string',
-          example: 'https://www.instagram.com/company',
-        },
+        companySns: { type: 'string', example: 'https://www.instagram.com/company' },
         introduction: { type: 'string', example: '우리 회사는 ...' },
-        category: {
-          type: 'string',
-          enum: ['SHOPPING', 'TRAVEL', 'BEAUTY', 'FOOD'],
-          example: 'BEAUTY',
-        },
+        category: { type: 'string', example: 'BEAUTY' },
+        profileImage: { type: 'string', format: 'binary' },
       },
     },
   })
-  @UseInterceptors(FileInterceptor('profileImage'))
   async registerCompany(
-      @Body() dto: CompanySignupDto,
       @UploadedFile() file: Express.Multer.File,
+      @Body() dto: CompanySignupDto,
       @Req() req: Request,
   ): Promise<User> {
     if (file) {
       dto.profileImage = await this.s3Service.uploadFile(file, 'profile', 'company');
     }
-    const user = await this.authService.registerCompany(dto);
+
+    const user = await this.authService.registerCompany(dto, UserRole.BUSINESS);
     req.session.userId = user.id;
     req.session.userRole = user.role;
     return user;
   }
 
-
   @Post('signup/user')
-  @ApiOperation({
-    summary: '일반 회원가입',
-    description: '일반 회원가입을 진행합니다.',
-  })
+  @ApiOperation({ summary: '일반 회원가입', description: '일반 회원가입' })
   @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('profileImage'))
   @ApiBody({
     schema: {
       type: 'object',
@@ -149,16 +119,16 @@ export class AuthController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('profileImage'))
   async registerNormalUser(
-      @Body() dto: NomalSinupDto,
       @UploadedFile() file: Express.Multer.File,
+      @Body() dto: NomalSinupDto,
       @Req() req: Request,
   ): Promise<User> {
     if (file) {
-      dto.profileImage = await this.s3Service.uploadFile(file, 'profile', 'nomal');
+      dto.profileImage = await this.s3Service.uploadFile(file, 'profile', 'normal');
     }
-    const user = await this.authService.registerNormalUser(dto);
+
+    const user = await this.authService.registerNormalUser(dto, UserRole.NORMAL);
     req.session.userId = user.id;
     req.session.userRole = user.role;
     return user;
@@ -182,7 +152,6 @@ export class AuthController {
     const authUser = await this.authService.login(loginDto, req);
     return authUser;
   }
-
 
   @Get('session')
   @ApiOperation({
@@ -209,7 +178,6 @@ export class AuthController {
     }
     return { userId: req.session.userId, role: req.session.userRole };
   }
-
 
   @Post('logout')
   @ApiOperation({

@@ -1,6 +1,5 @@
 import {ApiPropertyOptional} from '@nestjs/swagger';
-import {IsEnum, IsOptional} from 'class-validator';
-import {Category} from "../../../../common/enum/category.enum";
+import { IsOptional} from 'class-validator';
 import {BaseSignupDto} from "./base-signup.dto";
 
 export class CreatorSignupDto extends BaseSignupDto {
@@ -13,12 +12,9 @@ export class CreatorSignupDto extends BaseSignupDto {
 
     @ApiPropertyOptional({
         description: '크리에이터 카테고리',
-        enum: Category,
-        example: Category.TRAVEL,
     })
     @IsOptional()
-    @IsEnum(Category)
-    category?: Category;
+    category?: string;
 
     @ApiPropertyOptional({
         description: '유튜브 URL',

@@ -1,7 +1,14 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from 'typeorm';
-import {Category} from "../../common/enum/category.enum";
 import {User} from "../users/user.entity";
 
+
+export enum ContentCategory {
+    SHOPPING = 'SHOPPING',
+    TRAVEL = 'TRAVEL',
+    BEAUTY = 'BEAUTY',
+    FOOD = 'FOOD',
+    ALL = 'ALL',
+}
 
 @Entity()
 export class Content {
@@ -28,10 +35,10 @@ export class Content {
 
     @Column({
         type: 'enum',
-        enum: Category,
+        enum: ContentCategory,
         nullable: false,
     })
-    category: Category;
+    category: ContentCategory;
 
     @Column({ type: 'text', nullable: true })
     location: string;

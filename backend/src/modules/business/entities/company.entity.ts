@@ -1,6 +1,5 @@
 import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from "typeorm";
 import {User} from "../../users/user.entity";
-import {Category} from "../../../common/enum/category.enum";
 
 @Entity()
 export class Company {
@@ -23,10 +22,6 @@ export class Company {
     @Column({ nullable: true })
     introduction: string;
 
-    @Column({
-        type: 'enum',
-        enum: Category,
-        nullable: true,
-    })
-    category: Category;
+    @Column({type: 'varchar', length: 255, nullable: true})
+    category: string;
 }

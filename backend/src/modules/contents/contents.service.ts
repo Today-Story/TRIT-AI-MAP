@@ -1,10 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
-import { Content } from './content.entity';
 import { ContentDto } from './contents.dto';
 import { plainToInstance } from 'class-transformer';
-import {Category} from "../../common/enum/category.enum";
+import {Content, ContentCategory} from "./content.entity";
 
 @Injectable()
 export class ContentsService {
@@ -23,14 +22,31 @@ export class ContentsService {
             console.log('유효한 데이터가 없습니다.');
             return;
         }
+
         try {
-            console.log(`${validContents.length}개의 데이터를 저장합니다.`);
-            await this.contentRepository.insert(validContents);
+            console.log(`${validContents.length}개의 데이터를 저장을 시도합니다.`);
+
+            for (const contentData of validContents) {
+                // ✅ 중복 확인: 같은 제목, URL을 가진 데이터가 있는지 체크
+                const existingContent = await this.contentRepository.findOne({
+                    where: { title: contentData.title, url: contentData.url }
+                });
+
+                if (existingContent) {
+                    console.log(`중복된 컨텐츠 발견 (ID: ${existingContent.id}) - 저장 안 함: ${contentData.title}`);
+                    continue; // 중복 데이터는 저장하지 않음
+                }
+
+                // ✅ 중복되지 않은 데이터만 저장
+                await this.contentRepository.insert(contentData);
+            }
+
             console.log('CSV 데이터 저장 완료.');
         } catch (error) {
             console.error('데이터 저장 중 오류 발생:', error);
         }
     }
+
 
     // 전체 컨텐츠 조회
     async findAll(): Promise<ContentDto[]> {
@@ -54,9 +70,9 @@ export class ContentsService {
             return plainToInstance(ContentDto, contents, { excludeExtraneousValues: true });
         }
         const decodedCategory = decodeURIComponent(category);
-        const categoryEnum = Object.values(Category).find(
+        const categoryEnum = Object.values(ContentCategory).find(
             cat => cat === decodedCategory
-        ) as Category;
+        ) as ContentCategory;
         if (!categoryEnum) {
             throw new BadRequestException(`잘못된 카테고리 값: ${decodedCategory}`);
         }

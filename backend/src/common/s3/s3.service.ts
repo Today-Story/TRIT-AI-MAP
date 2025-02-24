@@ -23,13 +23,13 @@ export class S3Service {
     async uploadFile(
         file: Express.Multer.File,
         category: 'profile',
-        userType?: 'creator' | 'company' | 'nomal'
+        userType?: 'creator' | 'company' | 'normal'
     ): Promise<string> {
         // 폴더 매핑: userType에 따라 폴더 경로를 지정
         const folderMap: Record<string, string> = {
             'profile_creator': 'profiles/creator',
             'profile_company': 'profiles/company',
-            'profile_nomal': 'profiles/nomal',
+            'profile_normal': 'profiles/normal',
         };
 
         const keyPrefix = userType ? `profile_${userType}` : 'profile_user';

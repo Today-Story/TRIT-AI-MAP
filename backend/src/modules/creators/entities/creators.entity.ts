@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, OneToMany } from "typeorm";
-import { Content } from "../../contents/content.entity";
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn,} from "typeorm";
+import {Content} from "../../contents/content.entity";
 import {User} from "../../users/user.entity";
-import {Category} from "../../../common/enum/category.enum";
+
+
 
 @Entity()
 export class Creator {
@@ -12,12 +13,9 @@ export class Creator {
     @JoinColumn()
     user: User;
 
-    @Column({
-        type: 'enum',
-        enum: Category,
-        nullable: false,
-    })
-    category: Category;
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    category: string;
+
 
     @Column({ type: 'varchar', length: 255, nullable: true })
     youtube: string;
@@ -33,4 +31,5 @@ export class Creator {
 
     @OneToMany(() => Content, (content) => content.user)
     contents: Content[];
+
 }
