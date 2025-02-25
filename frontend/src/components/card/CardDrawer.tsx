@@ -5,8 +5,9 @@ import { cn } from "@utils/cn";
 import { getDistanceFromLatLngInKm } from "@utils/map";
 
 import axios from "axios";
-import { MdOutlineFilterList, MdOutlineKeyboardArrowDown } from "react-icons/md";
+import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
+import CardAIPath from "./CardAIPath";
 import CardDetail from "./CardDetail";
 import CardSummary from "./CardSummary";
 import EmptyCard from "./EmptyCard";
@@ -20,7 +21,7 @@ interface CardDrawerProps {
   currentLocation: { lat: number; lng: number };
 }
 
-export type DrawerMode = "collapsed" | "summary" | "detail";
+export type DrawerMode = "collapsed" | "summary" | "detail" | "ai-path";
 
 export default function CardDrawer({
   drawerMode,
@@ -33,9 +34,12 @@ export default function CardDrawer({
 
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "YOUR_GOOGLE_MAP_API_KEY";
 
-  const onToggleDrawer = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
+  const onToggleDrawer = () => {
     setDrawerMode(drawerMode === "collapsed" ? "summary" : "collapsed");
+  };
+
+  const onStartAIPath = () => {
+    setDrawerMode("ai-path");
   };
 
   useEffect(() => {
@@ -83,8 +87,11 @@ export default function CardDrawer({
             PLAY
             <MdOutlineKeyboardArrowDown size={24} />
           </button>
-          <button className="flex items-center justify-center aspect-square h-10 bg-primary-100 rounded-full w-max border border-primary-200 shadow-md shadow-primary-200">
-            <MdOutlineFilterList size={24} color="#007FFF" />
+          <button
+            onClick={onStartAIPath}
+            className="bg-primary-100 rounded-full py-2 px-4 w-max border border-primary-200 shadow-md shadow-primary-200 gradient-chip relative text-primary-300"
+          >
+            AI PATH
           </button>
         </div>
       )}
@@ -97,6 +104,8 @@ export default function CardDrawer({
             currentLocation={currentLocation}
             setDrawerMode={setDrawerMode}
           />
+        ) : drawerMode === "ai-path" ? (
+          <CardAIPath />
         ) : (
           <CardDetail
             address={address}
