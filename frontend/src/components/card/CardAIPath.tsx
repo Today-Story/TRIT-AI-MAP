@@ -11,13 +11,16 @@ const TABS = ["Plan", "Guide"];
 
 export default function CardAIPath() {
   const [currentTab, setCurrentTab] = useState("Plan");
-  // const [addresses, setAddresses] = useState(["", ""]);
-  const contents = useDrawerStore((state) => state.contents);
+  const { contents, setContents } = useDrawerStore();
   const [isPlanMade, setIsPlanMade] = useState(false);
 
   const onClickContinue = () => {
-    const isAddressEmpty = contents.some((content) => content.name === "");
+    const isAddressEmpty = contents.slice(0, -1).some((content) => content.name === "");
     if (isAddressEmpty) return alert("Please fill in all addresses.");
+
+    const lastIndex = contents.length - 1;
+    if (contents[lastIndex].name === "") setContents(contents.slice(0, -1));
+
     setCurrentTab("Guide");
     setIsPlanMade(true);
   };

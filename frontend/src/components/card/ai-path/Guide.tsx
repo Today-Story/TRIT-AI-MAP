@@ -33,7 +33,7 @@ export default function Guide({ isPlanMade }: GuideProps) {
         {contents.map((content, index) => (
           <div key={index} className="flex items-center justify-between gap-3">
             <div className="flex items-start gap-3">
-              <span className="bg-primary-300 text-white w-6 h-6 flex items-center justify-center rounded-full text-xs">
+              <span className="bg-primary-300 text-white w-6 h-6 shrink-0 flex items-center justify-center rounded-full text-xs">
                 {index + 1}
               </span>
               <div className="flex flex-col gap-1">
