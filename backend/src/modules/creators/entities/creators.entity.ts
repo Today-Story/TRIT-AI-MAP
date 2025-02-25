@@ -16,7 +16,6 @@ export class Creator {
     @Column({ type: 'varchar', length: 255, nullable: true })
     category: string;
 
-
     @Column({ type: 'varchar', length: 255, nullable: true })
     youtube: string;
 

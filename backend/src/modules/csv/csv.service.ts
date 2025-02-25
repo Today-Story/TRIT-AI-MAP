@@ -28,8 +28,9 @@ export class CsvService {
     }
 
     async readContentCsv(): Promise<any[]> {
-        const users = await this.creatorRepository.find({relations: ['user']});
-        const userMap = new Map(users.map(user => [user.user.email.trim().toLowerCase(), user]));
+        const creators = await this.creatorRepository.find({ relations: ['user'] });
+        const validCreators = creators.filter(creator => creator.user && creator.user.email);
+        const userMap = new Map(validCreators.map(creator => [creator.user.email.trim().toLowerCase(), creator]));
         return this.readCsvFile('content.csv', (data) => this.formatContentData(data, userMap));
     }
 
@@ -88,7 +89,7 @@ export class CsvService {
                 youtube: data['유튜브'] || null,
                 instagram: data['인스타'] || null,
                 tiktok: data['틱톡'] || null,
-                profileImage: data['프로필이미지'] || null,
+                profileImage: data['프로필이미지'] ? data['프로필이미지'].trim() : null,
                 introduction: data['소개'] || null,
             },
         };
@@ -112,8 +113,28 @@ export class CsvService {
             return null;
         }
 
+        const rawPostNumber = data['게시물 번호'];
+        const postNumber = Number(rawPostNumber.trim());
+        if (isNaN(postNumber)) {
+            console.error('게시물 번호가 숫자로 변환되지 않습니다:', rawPostNumber);
+            return null;
+        }
+
+        // 작성자(크리에이터) 매핑: CSV의 작성자 ID를 사용 (소문자 기준)
+        const userKeyRaw = data['작성자 ID']?.trim();
+        if (!userKeyRaw) {
+            console.warn('작성자 ID가 없습니다. 건너뜁니다:', data);
+            return null;
+        }
+        const keyLower = userKeyRaw.toLowerCase();
+        const creator = userMap.get(keyLower);
+        if (!creator) {
+            console.warn(`매핑되지 않은 작성자 ID: "${userKeyRaw}"`, data);
+            return null; // 작성자를 찾지 못하면 해당 컨텐츠는 저장하지 않음.
+        }
+
         return {
-            postNumber: Number(data['게시물 번호'].trim()) || 0,
+            postNumber: postNumber,
             title: data['제목']?.trim() || '제목 없음',
             url: data['URL']?.trim() || '',
             createdAt: data['작성시각'] ? new Date(data['작성시각']) : null,
@@ -124,8 +145,12 @@ export class CsvService {
             location: this.formatLocation(data['위치']),
             latitude: this.parseLatitudeLongitude(data['위도']),
             longitude: this.parseLatitudeLongitude(data['경도']),
+            user: { id: creator.user.id }, // 연결된 User의 id로 매핑
         };
     }
+
+
+
 
     private parseHashtags(value: string | undefined): string[] {
         if (!value || value.trim() === '') return [];

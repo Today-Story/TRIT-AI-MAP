@@ -1,4 +1,4 @@
-import { BusinessCategory } from './entities/business.entity';
+import { BusinessCategory } from '../entities/business.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ProductResponseDto {
