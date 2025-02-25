@@ -31,7 +31,8 @@
       "@styles/*": ["styles/*"],
       "@utils/*": ["utils/*"],
       "@api/*": ["api/*"],
-      "@services/*": ["services/*"]
+      "@services/*": ["services/*"],
+      "@hooks/*": ["hooks/*"]
     }
   },
   "include": ["src"]
