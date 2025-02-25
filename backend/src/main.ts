@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {});
 
   app.enableCors({
-      origin: ['https://trit.framer.ai', 'http://localhost:5173'],
+      origin: '*',
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       allowedHeaders: 'Content-Type, Authorization', // '*' 대신 명시적으로 설정
       credentials: true, // 쿠키/인증 정보를 포함한 요청 허용
