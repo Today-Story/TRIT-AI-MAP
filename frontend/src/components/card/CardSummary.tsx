@@ -4,23 +4,24 @@ import { ContentDTO } from "@services/contents";
 import { getDistanceFromLatLngInKm } from "@utils/map";
 
 import axios from "axios";
+import { useDrawerStore } from "lib/zustand/drawer";
 import { AiFillInstagram } from "react-icons/ai";
 import { SiTiktok } from "react-icons/si";
 
-import { DrawerMode } from "./CardDrawer";
 import StarRating from "../StarRating";
 import Tag from "../Tag";
 
 interface CardSummaryProps {
   place: ContentDTO | null;
   currentLocation: { lat: number; lng: number };
-  setDrawerMode: React.Dispatch<React.SetStateAction<DrawerMode>>;
 }
 
 const youtubeEmbedUrls = ["https://www.youtube.com/embed", "https://youtube.com/embed"];
 
-export default function CardSummary({ place, currentLocation, setDrawerMode }: CardSummaryProps) {
+export default function CardSummary({ place, currentLocation }: CardSummaryProps) {
   const [address, setAddress] = useState({ name: "", distance: 0 });
+
+  const setDrawerMode = useDrawerStore((state) => state.setDrawerMode);
 
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "YOUR_GOOGLE_MAP_API_KEY";
 

@@ -11,6 +11,9 @@ export default {
         },
         placeholder: "#A6D6F4",
         "dark-blue": "#254685",
+        food: "#FFBC45",
+        shopping: "#B5DD24",
+        beauty: "##F06292",
       },
       maxWidth: {
         mobile: "450px",

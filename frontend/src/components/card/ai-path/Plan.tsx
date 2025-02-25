@@ -1,15 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 
+import { useDebounce } from "@hooks/useDebounce";
+import { ContentDTO } from "@services/contents";
 import { getRandomPlan } from "@utils/ai";
 import { cn } from "@utils/cn";
 
+import { api } from "apis";
+import { useContentStore } from "lib/zustand/contents";
+import { useDrawerStore } from "lib/zustand/drawer";
 import { CgSpinner } from "react-icons/cg";
 import { MdClose, MdOutlineSearch } from "react-icons/md";
 
 export default function Plan() {
-  const [addresses, setAddresses] = useState(["", ""]);
-  const [focusIndex, setFocusIndex] = useState(-1);
   const [loadingIndex, setLoadingIndex] = useState(-1);
+
+  const {
+    contents: addresses,
+    setContents: setAddresses,
+    focusIndex,
+    setFocusIndex,
+  } = useDrawerStore();
+
+  const { contents, setContents } = useContentStore();
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -25,14 +37,14 @@ export default function Plan() {
 
   const onAddAddress = (idx: number) => {
     const newAddresses = [...addresses];
-    newAddresses.splice(idx + 1, 0, "");
+    newAddresses.splice(idx + 1, 0, { name: "", category: "" });
     setAddresses(newAddresses);
     setFocusIndex(idx + 1);
   };
 
   const onChangeAddress = (idx: number, value: string) => {
     const newAddresses = [...addresses];
-    newAddresses[idx] = value;
+    newAddresses[idx].name = value;
     setAddresses(newAddresses);
   };
 
@@ -40,7 +52,7 @@ export default function Plan() {
     setLoadingIndex(idx);
     setTimeout(() => {
       setLoadingIndex(-1);
-      onChangeAddress(idx, getRandomPlan());
+      onChangeAddress(idx, getRandomPlan(contents));
     }, 1000);
   };
 
@@ -55,18 +67,34 @@ export default function Plan() {
     setAddresses(newAddresses);
   };
 
+  const debouncedAddresses = useDebounce(addresses, 500);
+
+  useEffect(() => {
+    (async () => {
+      const isEmpty = !debouncedAddresses[focusIndex]?.name.trim();
+      if (isEmpty) {
+        const res = await api.get<ContentDTO[]>("/contents");
+        return setContents(res.data);
+      }
+      const res = await api.get<ContentDTO[]>(
+        `/contents/search?name=${encodeURIComponent(debouncedAddresses[focusIndex].name)}`
+      );
+      setContents(res.data);
+    })();
+  }, [debouncedAddresses, focusIndex]);
+
   return (
     <section className="py-3 flex flex-col gap-3">
       {addresses.map((address, idx) => (
         <div key={idx} className="flex flex-col items-center gap-2">
           <div
             className={cn(
-              "flex rounded-full p-2 w-full justify-between bg-primary-200 text-primary-300",
+              "flex rounded-full p-2 w-full justify-between bg-primary-200 text-primary-300 gap-3",
               focusIndex === idx && "border border-primary-300 bg-white text-black"
             )}
           >
-            <div className="flex items-center gap-2">
-              <span className="bg-primary-300 text-white py-1 px-2 rounded-full text-xs">
+            <div className="flex items-center gap-2 flex-1">
+              <span className="bg-primary-300 text-white w-6 h-6 flex justify-center items-center rounded-full text-xs">
                 {idx + 1}
               </span>
               {loadingIndex === idx ? (
@@ -77,10 +105,8 @@ export default function Plan() {
                     inputRefs.current[idx] = el;
                   }}
                   placeholder="Enter directly"
-                  className={cn(
-                    "flex-1 w-full bg-transparent outline-none placeholder:text-gray-500"
-                  )}
-                  value={address}
+                  className="flex-1 w-full bg-transparent outline-none placeholder:text-gray-500"
+                  value={address.name}
                   onChange={(e) => onChangeAddress(idx, e.target.value)}
                   onFocus={() => onFocusInput(idx)}
                 />
@@ -97,6 +123,7 @@ export default function Plan() {
               </div>
             )}
           </div>
+
           {focusIndex === idx && (
             <div className="flex items-center gap-2 self-end">
               <button

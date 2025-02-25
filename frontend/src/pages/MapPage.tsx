@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 
-import CardDrawer, { DrawerMode } from "@components/card/CardDrawer";
+import CardDrawer from "@components/card/CardDrawer";
 import SearchBar from "@components/SearchBar";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { ContentDTO } from "@services/contents";
 
 import { api } from "apis";
+import { useContentStore } from "lib/zustand/contents";
+import { useDrawerStore } from "lib/zustand/drawer";
 
 const containerStyle = {
   width: "100vw",
@@ -26,15 +28,20 @@ const MapPage = () => {
 
   // 내 위치
   const [location, setLocation] = useState({ lat: 37.5665, lng: 126.978 });
-  const [contents, setContents] = useState<ContentDTO[]>([]);
   const [selectedContent, setSelectedContent] = useState<ContentDTO | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<string>("AI 추천");
-
-  const [drawerMode, setDrawerMode] = useState<DrawerMode>("collapsed");
-
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   console.log(setSelectedCategory);
+
+  const {
+    drawerMode,
+    setDrawerMode,
+    contents: addresses,
+    setContents: setAddresses,
+    focusIndex,
+  } = useDrawerStore();
+  const { contents, setContents } = useContentStore();
 
   const fetchContents = async () => {
     try {
@@ -52,14 +59,20 @@ const MapPage = () => {
     }
   };
 
-  const handleMapClick = () => {
+  const onMapClick = () => {
     setDrawerMode("collapsed");
     setSelectedContent(null);
   };
 
-  const handleMarkerClick = (content: ContentDTO) => {
+  const onMarkerClick = (content: ContentDTO) => {
     setSelectedContent(content);
     setDrawerMode("summary");
+  };
+
+  const onChangeAddress = (content: ContentDTO) => {
+    const newAddresses = [...addresses];
+    newAddresses[focusIndex] = { name: content.title, category: content.category };
+    setAddresses(newAddresses);
   };
 
   useEffect(() => {
@@ -82,6 +95,10 @@ const MapPage = () => {
     const timer = setTimeout(fetchContents, 300);
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  useEffect(() => {
+    if (drawerMode === "collapsed") fetchContents();
+  }, [drawerMode]);
 
   return (
     <div className="flex justify-center">
@@ -106,7 +123,7 @@ const MapPage = () => {
           mapContainerStyle={containerStyle}
           center={location}
           zoom={12}
-          onClick={handleMapClick}
+          onClick={onMapClick}
           options={{
             zoomControl: false,
             streetViewControl: false,
@@ -131,9 +148,9 @@ const MapPage = () => {
               selectedCategory ? c.category.toUpperCase() === selectedCategory : true
             )
             .filter((c) => c.latitude && c.longitude)
-            .map((c) => (
+            .map((c, idx) => (
               <Marker
-                key={c.id}
+                key={c.id ?? idx}
                 position={{
                   lat: parseFloat(c.latitude!),
                   lng: parseFloat(c.longitude!),
@@ -142,7 +159,7 @@ const MapPage = () => {
                   url: CATEGORY_ICON_MAP[c.category.toUpperCase()] || CATEGORY_ICON_MAP.DEFAULT,
                   scaledSize: new window.google.maps.Size(50, 50),
                 }}
-                onClick={() => handleMarkerClick(c)}
+                onClick={() => (drawerMode === "ai-path" ? onChangeAddress(c) : onMarkerClick(c))}
               />
             ))}
         </GoogleMap>
@@ -150,8 +167,6 @@ const MapPage = () => {
 
       {/* 하단 드로어 */}
       <CardDrawer
-        drawerMode={drawerMode}
-        setDrawerMode={setDrawerMode}
         contents={selectedContent}
         selectedContent={selectedContent}
         setSelectedContent={setSelectedContent}

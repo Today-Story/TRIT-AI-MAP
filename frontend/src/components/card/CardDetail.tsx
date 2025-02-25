@@ -5,9 +5,9 @@ import { ProductDTO } from "@services/products";
 import { cn } from "@utils/cn";
 
 import { getProductById } from "apis/products";
+import { useDrawerStore } from "lib/zustand/drawer";
 import { MdClose, MdLocalPhone } from "react-icons/md";
 
-import { DrawerMode } from "./CardDrawer";
 import Book from "./detail/Book";
 import Brand from "./detail/Brand";
 import Home from "./detail/Home";
@@ -19,14 +19,15 @@ import Tag from "../Tag";
 interface CardDetailProps {
   selectedContent: ContentDTO | null;
   address: { name: string; distance: number };
-  setDrawerMode: React.Dispatch<React.SetStateAction<DrawerMode>>;
 }
 
 const MENUS = ["Home", "Video", "Product", "Book", "Brand"];
 
-export default function CardDetail({ selectedContent, address, setDrawerMode }: CardDetailProps) {
+export default function CardDetail({ selectedContent, address }: CardDetailProps) {
   const [selectedMenu, setSelectedMenu] = useState("Home");
   const [products, setProducts] = useState<ProductDTO[]>([]);
+
+  const setDrawerMode = useDrawerStore((state) => state.setDrawerMode);
 
   const onSelectMenu = (menu: string) => {
     setSelectedMenu(menu);

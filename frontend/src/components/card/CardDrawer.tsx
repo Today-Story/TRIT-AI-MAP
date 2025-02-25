@@ -5,7 +5,7 @@ import { cn } from "@utils/cn";
 import { getDistanceFromLatLngInKm } from "@utils/map";
 
 import axios from "axios";
-import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import { useDrawerStore } from "lib/zustand/drawer";
 
 import CardAIPath from "./CardAIPath";
 import CardDetail from "./CardDetail";
@@ -13,8 +13,6 @@ import CardSummary from "./CardSummary";
 import EmptyCard from "./EmptyCard";
 
 interface CardDrawerProps {
-  drawerMode: DrawerMode;
-  setDrawerMode: React.Dispatch<React.SetStateAction<DrawerMode>>;
   contents: ContentDTO | null;
   selectedContent: ContentDTO | null;
   setSelectedContent: React.Dispatch<React.SetStateAction<ContentDTO | null>>;
@@ -24,19 +22,15 @@ interface CardDrawerProps {
 export type DrawerMode = "collapsed" | "summary" | "detail" | "ai-path";
 
 export default function CardDrawer({
-  drawerMode,
-  setDrawerMode,
   contents,
   selectedContent,
   currentLocation,
 }: CardDrawerProps) {
   const [address, setAddress] = useState({ name: "", distance: 0 });
 
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "YOUR_GOOGLE_MAP_API_KEY";
+  const { drawerMode, setDrawerMode } = useDrawerStore();
 
-  const onToggleDrawer = () => {
-    setDrawerMode(drawerMode === "collapsed" ? "summary" : "collapsed");
-  };
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "YOUR_GOOGLE_MAP_API_KEY";
 
   const onStartAIPath = () => {
     setDrawerMode("ai-path");
@@ -79,39 +73,22 @@ export default function CardDrawer({
       )}
     >
       {drawerMode !== "detail" && (
-        <div className="flex gap-2 self-end">
-          <button
-            onClick={onToggleDrawer}
-            className="flex gap-5 bg-primary-100 text-primary-300 rounded-full w-max py-2 px-4 border border-primary-200 items-center shadow-md shadow-primary-200"
-          >
-            PLAY
-            <MdOutlineKeyboardArrowDown size={24} />
-          </button>
-          <button
-            onClick={onStartAIPath}
-            className="bg-primary-100 rounded-full py-2 px-4 w-max border border-primary-200 shadow-md shadow-primary-200 gradient-chip relative text-primary-300"
-          >
-            AI PATH
-          </button>
-        </div>
+        <button
+          onClick={onStartAIPath}
+          className="bg-primary-100 rounded-full py-2 px-4 w-max border border-primary-200 shadow-md shadow-primary-200 gradient-chip relative text-primary-300 self-end"
+        >
+          AI PATH
+        </button>
       )}
       <div className="rounded-3xl shadow-lg z-10 transition-all duration-300 max-h-1/4">
         {drawerMode === "collapsed" ? (
           <EmptyCard />
         ) : drawerMode === "summary" ? (
-          <CardSummary
-            place={contents}
-            currentLocation={currentLocation}
-            setDrawerMode={setDrawerMode}
-          />
+          <CardSummary place={contents} currentLocation={currentLocation} />
         ) : drawerMode === "ai-path" ? (
           <CardAIPath />
         ) : (
-          <CardDetail
-            address={address}
-            selectedContent={selectedContent}
-            setDrawerMode={setDrawerMode}
-          />
+          <CardDetail address={address} selectedContent={selectedContent} />
         )}
       </div>
     </div>
