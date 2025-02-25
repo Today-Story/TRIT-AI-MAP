@@ -67,7 +67,7 @@ services:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
       - ./certbot/www:/var/www/certbot
-    command: certonly --webroot --webroot-path=/var/www/certbot --email rkdmf9988@gmail.com --agree-tos --no-eff-email -d api.trit.store
+    command: certonly --webroot --webroot-path=/var/www/certbot --email rkdmf9988@gmail.com --agree-tos --no-eff-email -d api.trit.app
 
 volumes:
   postgres-data:
