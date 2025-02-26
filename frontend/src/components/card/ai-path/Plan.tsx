@@ -52,7 +52,9 @@ export default function Plan() {
     setLoadingIndex(idx);
     setTimeout(() => {
       setLoadingIndex(-1);
-      onChangeAddress(idx, getRandomPlan(contents));
+      const newAddresses = [...addresses];
+      newAddresses[idx] = getRandomPlan(contents);
+      setAddresses(newAddresses);
     }, 1000);
   };
 
