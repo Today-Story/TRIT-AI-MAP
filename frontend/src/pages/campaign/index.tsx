@@ -28,8 +28,8 @@ const getDDay = (applicationEnd: string) => {
 const campaignData: CampaignDTO[] = [
   {
     id: 1,
-    title: "New Product Launch Campaign",
-    brandName: "ABC Company",
+    title: "Chuna therapy wellness program",
+    brandName: "Bonline Korean Medicine Clinic",
     image: clinic1,
     applicationStart: "2025-03-01",
     applicationEnd: "2025-03-10",
@@ -42,9 +42,9 @@ const campaignData: CampaignDTO[] = [
     videoMax: 120,
     sns: ["youtube", "instagram"],
     missionText: "Create a video review of the product",
-    productDetail: "Detailed description of the product",
+    productDetail: "Korean manual therapy focused on spine alignment and overall wellness",
     rewardCredit: "1000",
-    rewardAdditional: "Additional bonus payment",
+    rewardAdditional: "Additional herbal supplement package for continued care",
     notes: "Notes content",
     location: "Seoul",
     reserveTime: "2025-03-05",
@@ -54,8 +54,8 @@ const campaignData: CampaignDTO[] = [
   },
   {
     id: 2,
-    title: "Winter New Clothes Experience Group Recruitment",
-    brandName: "Fashionista",
+    title: "One-Day Whitening Treatment Package",
+    brandName: "Maison de M Clinic ",
     image: clinic2,
     applicationStart: "2025-03-15",
     applicationEnd: "2025-03-25",
@@ -68,9 +68,9 @@ const campaignData: CampaignDTO[] = [
     videoMax: 0,
     sns: ["instagram"],
     missionText: "Share styling after wearing new clothes",
-    productDetail: "Warm and stylish winter clothes",
+    productDetail: "A specialized one-day whitening treatment that brightens and revitalizes skin",
     rewardCredit: "500",
-    rewardAdditional: "Additional gifts for excellent reviews",
+    rewardAdditional: "Additional skincare set for enhanced and lasting results",
     notes: "#winterfashion #ootd hashtags required",
     location: "Busan",
     reserveTime: null,
@@ -80,8 +80,8 @@ const campaignData: CampaignDTO[] = [
   },
   {
     id: 3,
-    title: "Premium Coffee Tasting Group Recruitment",
-    brandName: "CoffeeLover",
+    title: "Head spa (Scalp treatment & scaling)",
+    brandName: "Junohair",
     image: beauty1,
     applicationStart: "2025-03-01",
     applicationEnd: "2025-03-10",
@@ -94,9 +94,9 @@ const campaignData: CampaignDTO[] = [
     videoMax: 0,
     sns: ["youtube", "instagram"],
     missionText: "Write an honest review after tasting coffee",
-    productDetail: "Premium coffee made with the finest beans",
+    productDetail: "Professional scalp care including massage, scaling, and relaxation",
     rewardCredit: "700",
-    rewardAdditional: "Coffee gift set",
+    rewardAdditional: "Hair care kit for ongoing scalp health",
     notes: "Only those who love coffee, please apply",
     location: "Incheon",
     reserveTime: null,
@@ -106,8 +106,8 @@ const campaignData: CampaignDTO[] = [
   },
   {
     id: 4,
-    title: "New Year's Diet Challenge",
-    brandName: "HealthyLife",
+    title: "Fresh & Shiny mood idol makeup & styling",
+    brandName: "YONING",
     image: beauty2,
     applicationStart: "2025-02-20",
     applicationEnd: "2025-02-31",
@@ -120,9 +120,9 @@ const campaignData: CampaignDTO[] = [
     videoMax: 180,
     sns: ["youtube", "instagram", "tiktok"],
     missionText: "Record the diet process on video",
-    productDetail: "Health functional food that helps reduce body fat",
+    productDetail: "Makeup and styling service for a fresh and shiny idol-like look",
     rewardCredit: "1200",
-    rewardAdditional: "Additional rewards for successful diets",
+    rewardAdditional: "Additional beauty products for final touch-ups",
     notes: "#diet #health #challenge hashtags required",
     location: "Daegu",
     reserveTime: null,
@@ -224,9 +224,9 @@ export default function CampaignPage() {
                 <span className="text-xs font-semibold absolute top-3 left-3 rounded-full bg-primary-100 px-3 py-1">
                   {campaign.location}
                 </span>
-                <button className="absolute bottom-3 right-3">
+                <div className="absolute bottom-3 right-3">
                   <MdFavoriteBorder size={24} />
-                </button>
+                </div>
               </div>
               <div className="flex gap-1 text-lg items-center">
                 {campaign.sns.includes("youtube") && <AiFillYoutube />}
