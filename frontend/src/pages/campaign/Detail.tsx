@@ -1,11 +1,40 @@
+import { CampaignDTO } from "@services/campaign";
+
 import { AiFillInstagram, AiFillTikTok, AiFillYoutube } from "react-icons/ai";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { MdArrowForward, MdOutlineCheck, MdOutlineKeyboardArrowLeft } from "react-icons/md";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+
+interface StateProps {
+  state: {
+    item: CampaignDTO;
+  };
+}
+
+const getDDay = (applicationEnd: string) => {
+  const now = new Date();
+  const end = new Date(applicationEnd);
+
+  const diffTime = end.getTime() - now.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays <= 0) {
+    return "OVER";
+  }
+
+  return `${diffDays} days left`;
+};
+
+const formatDate = (date: string) => {
+  return date.split("-").splice(1, 2).join(".");
+};
 
 export default function CampaignDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const {
+    state: { item },
+  }: StateProps = useLocation();
 
   const onRouteApply = () => {
     navigate(`/campaign/apply/${id}`);
@@ -31,7 +60,9 @@ export default function CampaignDetailPage() {
                 +3P
               </span>
             </div>
-            <span className="text-dark-blue text-base">[BRAND] Campaign Title Text Please</span>
+            <span className="text-dark-blue text-base">
+              [{item.brandName}] {item.title}
+            </span>
           </div>
           <div className="flex gap-2 items-center">
             <div className="flex gap-1">
@@ -39,7 +70,7 @@ export default function CampaignDetailPage() {
               <AiFillInstagram size={24} />
               <AiFillTikTok size={24} />
             </div>
-            <span className="text-sm text-primary-300">3일 남음</span>
+            <span className="text-sm text-primary-300">{getDDay(item.applicationEnd)}</span>
           </div>
         </div>
         <div className="flex-1 bg-gray-200 aspect-square rounded-xl" />
@@ -51,26 +82,28 @@ export default function CampaignDetailPage() {
             <div className="aspect-square w-3 h-3 bg-placeholder rounded-full" />
             Application Period
           </div>
-          <span className="flex-1">02.24 ~ 04.12</span>
+          <span className="flex-1">
+            {formatDate(item.selectionStart)} ~ {formatDate(item.selectionEnd)}
+          </span>
         </div>
         <div className="flex text-primary-300 font-semibold">
           <div className="flex-1 flex items-center gap-2">
             <div className="aspect-square w-3 h-3 bg-primary-300 rounded-full" />
             Creator Presentation
           </div>
-          <span className="flex-1">04.14</span>
+          <span className="flex-1">{formatDate(item.selectionEnd)}</span>
         </div>
         <div className="flex text-placeholder">
           <div className="flex-1 flex items-center gap-2">
             <div className="aspect-square w-3 h-3 bg-placeholder rounded-full" />
             Campaign Result
           </div>
-          <span className="flex-1">04.16</span>
+          <span className="flex-1">{formatDate(item.resultAnnouncement)}</span>
         </div>
         <div className="text-primary-300 bg-primary-100 rounded-full px-6 py-2 flex">
           <span className="flex-1">applicant</span>
           <span className="flex-1">
-            112 <span className="text-placeholder">/ 10명</span>
+            112 <span className="text-placeholder">/ {item.people}명</span>
           </span>
         </div>
       </section>
@@ -85,7 +118,9 @@ export default function CampaignDetailPage() {
         </div>
         <div className="flex gap-2 overflow-x-scroll hide-scrollbar">
           <div className="space-y-2">
-            <div className="aspect-video-vertical w-36 bg-gray-200 rounded-lg" />
+            <div className="aspect-video-vertical w-36 bg-primary-200 rounded-lg text-primary-300 flex justify-center items-center">
+              <AiFillInstagram size={32} />
+            </div>
             <div className="flex items-center gap-1">
               <IoPersonCircleOutline size={24} />
               <span className="text-sm">PROFILE</span>
@@ -99,11 +134,13 @@ export default function CampaignDetailPage() {
         <div className="space-y-2 py-2 mt-2 border-t-2 border-placeholder">
           <div className="text-dark-blue flex items-center gap-1">
             <MdOutlineCheck />
-            <p className="text-sm font-semibold">Video Length : 15sec - 30sec</p>
+            <p className="text-sm font-semibold">
+              Video Length : {item.videoMin}sec - {item.videoMax}sec
+            </p>
           </div>
           <div className="text-dark-blue flex items-center gap-1">
             <MdOutlineCheck />
-            <p className="text-sm">Get treatment at 00 Market and record the process</p>
+            <p className="text-sm">Get treatment at {item.brandName} and record the process</p>
           </div>
         </div>
       </section>
@@ -127,7 +164,7 @@ export default function CampaignDetailPage() {
       <section className="p-3">
         <h2 className="font-bold text-primary-300">PRODUCT DETAIL</h2>
         <div className="py-2 mt-2 border-t-2 border-placeholder flex gap-2 text-sm">
-          Product Detail Section
+          {item.productDetail}
         </div>
       </section>
 
@@ -136,7 +173,7 @@ export default function CampaignDetailPage() {
       <section className="p-3">
         <h2 className="font-bold text-primary-300">ADDITIONAL INFORMATION</h2>
         <div className="py-2 mt-2 border-t-2 border-placeholder flex gap-2 text-sm">
-          Additional Information Section
+          {item.notes}
         </div>
       </section>
 

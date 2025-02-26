@@ -19,8 +19,8 @@ export interface CampaignDTO {
   rewardAdditional: string;
   notes: string;
   location: string;
-  reserveTime: string;
-  visitTime: string;
+  reserveTime: string | null;
+  visitTime: string | null;
   status: string;
   createdAt: string;
 }
