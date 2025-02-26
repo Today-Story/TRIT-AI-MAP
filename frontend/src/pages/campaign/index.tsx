@@ -1,10 +1,15 @@
 import { useState } from "react";
 
+import beauty1 from "@assets/beauty_1.png";
+import beauty2 from "@assets/beauty_2.png";
+import clinic1 from "@assets/clinic_1.png";
+import clinic2 from "@assets/clinic_2.png";
+import { CampaignDTO } from "@services/campaign";
 import { cn } from "@utils/cn";
 
 import { AiFillInstagram, AiFillTikTok, AiFillYoutube } from "react-icons/ai";
 import { MdBookmark, MdFavoriteBorder, MdKeyboardArrowDown } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const getDDay = (applicationEnd: string) => {
   const now = new Date();
@@ -20,14 +25,14 @@ const getDDay = (applicationEnd: string) => {
   return `D-${diffDays}`;
 };
 
-const campaignData = [
+const campaignData: CampaignDTO[] = [
   {
     id: 1,
-    title: "신제품 런칭 캠페인",
+    title: "New Product Launch Campaign",
     brandName: "ABC Company",
-    image: "",
+    image: clinic1,
     applicationStart: "2025-03-01",
-    applicationEnd: "2024-12-30",
+    applicationEnd: "2025-03-10",
     selectionStart: "2025-03-11",
     selectionEnd: "2025-03-15",
     announcement: "2025-03-16",
@@ -36,11 +41,11 @@ const campaignData = [
     videoMin: 30,
     videoMax: 120,
     sns: ["youtube", "instagram"],
-    missionText: "제품 사용후기를 동영상으로 제작",
-    productDetail: "제품의 상세 설명",
+    missionText: "Create a video review of the product",
+    productDetail: "Detailed description of the product",
     rewardCredit: "1000",
-    rewardAdditional: "추가 보너스 지급",
-    notes: "주의사항 내용",
+    rewardAdditional: "Additional bonus payment",
+    notes: "Notes content",
     location: "Seoul",
     reserveTime: "2025-03-05",
     visitTime: "2025-03-06",
@@ -49,24 +54,24 @@ const campaignData = [
   },
   {
     id: 2,
-    title: "겨울 신상 의류 체험단 모집",
+    title: "Winter New Clothes Experience Group Recruitment",
     brandName: "Fashionista",
-    image: "",
-    applicationStart: "2025-01-15",
-    applicationEnd: "2025-01-25",
-    selectionStart: "2025-01-26",
-    selectionEnd: "2025-01-28",
-    announcement: "2025-01-29",
-    resultAnnouncement: "2025-02-05",
+    image: clinic2,
+    applicationStart: "2025-03-15",
+    applicationEnd: "2025-03-25",
+    selectionStart: "2025-03-26",
+    selectionEnd: "2025-03-28",
+    announcement: "2025-03-29",
+    resultAnnouncement: "2025-04-05",
     people: 30,
     videoMin: 0,
     videoMax: 0,
     sns: ["instagram"],
-    missionText: "신상 의류 착용 후 스타일링 공유",
-    productDetail: "따뜻하고 스타일리쉬한 겨울 의류",
+    missionText: "Share styling after wearing new clothes",
+    productDetail: "Warm and stylish winter clothes",
     rewardCredit: "500",
-    rewardAdditional: "우수 후기 선정 시 추가 상품 증정",
-    notes: "#겨울패션 #ootd 해시태그 필수",
+    rewardAdditional: "Additional gifts for excellent reviews",
+    notes: "#winterfashion #ootd hashtags required",
     location: "Busan",
     reserveTime: null,
     visitTime: null,
@@ -75,24 +80,24 @@ const campaignData = [
   },
   {
     id: 3,
-    title: "프리미엄 커피 시음단 모집",
+    title: "Premium Coffee Tasting Group Recruitment",
     brandName: "CoffeeLover",
-    image: "",
-    applicationStart: "2024-12-01",
-    applicationEnd: "2024-12-10",
-    selectionStart: "2024-12-11",
-    selectionEnd: "2024-12-15",
-    announcement: "2024-12-16",
-    resultAnnouncement: "2024-12-20",
+    image: beauty1,
+    applicationStart: "2025-03-01",
+    applicationEnd: "2025-03-10",
+    selectionStart: "2025-03-11",
+    selectionEnd: "2025-03-15",
+    announcement: "2025-03-16",
+    resultAnnouncement: "2025-03-20",
     people: 20,
     videoMin: 0,
     videoMax: 0,
     sns: ["youtube", "instagram"],
-    missionText: "커피 시음 후 솔직한 후기 작성",
-    productDetail: "최고급 원두로 만든 프리미엄 커피",
+    missionText: "Write an honest review after tasting coffee",
+    productDetail: "Premium coffee made with the finest beans",
     rewardCredit: "700",
-    rewardAdditional: "커피 선물 세트 증정",
-    notes: "커피를 사랑하는 분들만 지원해주세요",
+    rewardAdditional: "Coffee gift set",
+    notes: "Only those who love coffee, please apply",
     location: "Incheon",
     reserveTime: null,
     visitTime: null,
@@ -101,57 +106,29 @@ const campaignData = [
   },
   {
     id: 4,
-    title: "새해맞이 다이어트 챌린지",
+    title: "New Year's Diet Challenge",
     brandName: "HealthyLife",
-    image: "",
-    applicationStart: "2024-12-20",
-    applicationEnd: "2024-12-31",
-    selectionStart: "2025-01-02",
-    selectionEnd: "2025-01-05",
-    announcement: "2025-01-06",
-    resultAnnouncement: "2025-01-10",
+    image: beauty2,
+    applicationStart: "2025-02-20",
+    applicationEnd: "2025-02-31",
+    selectionStart: "2025-03-02",
+    selectionEnd: "2025-03-05",
+    announcement: "2025-03-06",
+    resultAnnouncement: "2025-03-10",
     people: 15,
     videoMin: 60,
     videoMax: 180,
     sns: ["youtube", "instagram", "tiktok"],
-    missionText: "다이어트 과정 영상으로 기록",
-    productDetail: "체지방 감소에 도움을 주는 건강기능식품",
+    missionText: "Record the diet process on video",
+    productDetail: "Health functional food that helps reduce body fat",
     rewardCredit: "1200",
-    rewardAdditional: "다이어트 성공 시 추가 리워드",
-    notes: "#다이어트 #건강 #챌린지 해시태그 필수",
+    rewardAdditional: "Additional rewards for successful diets",
+    notes: "#diet #health #challenge hashtags required",
     location: "Daegu",
     reserveTime: null,
     visitTime: null,
     status: "PENDING",
-    createdAt: "2024-12-15",
-  },
-];
-
-const trendingCampaigns = [
-  {
-    id: 1,
-    title: "[BRAND] Campaign Title Text Please",
-    sns: ["youtube", "instagram", "tiktok"],
-  },
-  {
-    id: 2,
-    title: "[BRAND] Campaign Title Text Please",
-    sns: ["youtube", "instagram"],
-  },
-  {
-    id: 3,
-    title: "[BRAND] Campaign Title Text Please",
-    sns: ["youtube", "tiktok"],
-  },
-  {
-    id: 4,
-    title: "[BRAND] Campaign Title Text Please",
-    sns: ["instagram", "tiktok"],
-  },
-  {
-    id: 5,
-    title: "[BRAND] Campaign Title Text Please",
-    sns: ["youtube"],
+    createdAt: "2025-03-15",
   },
 ];
 
@@ -160,6 +137,7 @@ const categories = ["ALL", "TRAVEL", "FOOD", "SHOPPING", "BEAUTY"];
 export default function CampaignPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("ALL");
+  const navigate = useNavigate();
 
   const onToggleDropdown = () => {
     setIsOpen((prev) => !prev);
@@ -170,14 +148,23 @@ export default function CampaignPage() {
     setIsOpen(false);
   };
 
+  const onRouteDetail = (item: CampaignDTO) => {
+    navigate(`/campaign/${item.id}`, { state: { item } });
+  };
+
   return (
     <main>
       <section className="bg-primary-100 py-6 px-3 space-y-3">
         <h2 className="text-primary-300 font-bold">TRENDING CAMPAIGNS</h2>
         <div className="flex overflow-x-scroll hide-scrollbar gap-2">
-          {trendingCampaigns.map((campaign, idx) => (
-            <div key={idx} className="shrink-0 max-w-28 space-y-1">
-              <div className="aspect-square bg-gray-200 rounded-xl relative">
+          {campaignData.map((campaign, idx) => (
+            <button
+              key={idx}
+              className="shrink-0 max-w-28 space-y-1 text-start"
+              onClick={() => onRouteDetail(campaign)}
+            >
+              <div className="aspect-square relative">
+                <img src={campaign.image} alt={campaign.title} className="rounded-xl " />
                 {idx < 3 && (
                   <div className="absolute -top-1 left-1 text-primary-300 z-10 flex justify-center items-center">
                     <MdBookmark size={36} />
@@ -191,7 +178,7 @@ export default function CampaignPage() {
                 {campaign.sns.includes("instagram") && <AiFillInstagram />}
                 {campaign.sns.includes("tiktok") && <AiFillTikTok />}
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </section>
@@ -226,31 +213,36 @@ export default function CampaignPage() {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          {campaignData.map((item) => (
-            <Link key={item.id} className="space-y-2" to={`/campaign/${item.id}`}>
-              <div className="aspect-square bg-gray-200 rounded-xl relative text-primary-300">
+          {campaignData.map((campaign) => (
+            <button
+              key={campaign.id}
+              className="space-y-2 text-start"
+              onClick={() => onRouteDetail(campaign)}
+            >
+              <div className="aspect-square relative text-primary-300">
+                <img src={campaign.image} alt={campaign.title} className="rounded-xl " />
                 <span className="text-xs font-semibold absolute top-3 left-3 rounded-full bg-primary-100 px-3 py-1">
-                  {item.location}
+                  {campaign.location}
                 </span>
                 <button className="absolute bottom-3 right-3">
                   <MdFavoriteBorder size={24} />
                 </button>
               </div>
               <div className="flex gap-1 text-lg items-center">
-                {item.sns.includes("youtube") && <AiFillYoutube />}
-                {item.sns.includes("instagram") && <AiFillInstagram />}
-                {item.sns.includes("tiktok") && <AiFillTikTok />}
+                {campaign.sns.includes("youtube") && <AiFillYoutube />}
+                {campaign.sns.includes("instagram") && <AiFillInstagram />}
+                {campaign.sns.includes("tiktok") && <AiFillTikTok />}
                 <span className="px-3 py-1 rounded-full bg-primary-200 text-primary-300 text-xs font-semibold">
-                  {getDDay(item.applicationEnd)}
+                  {getDDay(campaign.applicationEnd)}
                 </span>
               </div>
-              <p className="text-sm font-medium line-clamp-2 text-dark-blue">{item.title}</p>
-              <p className="text-xs text-primary-300 font-medium">{item.rewardAdditional}</p>
+              <p className="text-sm font-medium line-clamp-2 text-dark-blue">{campaign.title}</p>
+              <p className="text-xs text-primary-300 font-medium">{campaign.rewardAdditional}</p>
               <div className="flex justify-between text-xs text-primary-300">
                 <span className="font-semibold">Apply 121</span>
-                <span>Recruit {item.people}</span>
+                <span>Recruit {campaign.people}</span>
               </div>
-            </Link>
+            </button>
           ))}
         </div>
       </section>
