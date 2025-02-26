@@ -10,7 +10,6 @@ export default function CampaignApplyPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // 아코디언 열림/닫힘 상태
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
 
@@ -191,7 +190,7 @@ export default function CampaignApplyPage() {
         </div>
       </section>
 
-      <footer className="pb-6 px-3">
+      <footer className="pb-[108px] px-3">
         <button className="w-full py-3 bg-primary-300 text-white font-semibold rounded-md text-sm">
           Apply
         </button>
