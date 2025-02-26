@@ -44,6 +44,8 @@ export default function CampaignDetailPage() {
     navigate("/campaign");
   };
 
+  console.log(item);
+
   return (
     <main>
       <header className="bg-primary-100 px-3 pt-3">
@@ -66,14 +68,15 @@ export default function CampaignDetailPage() {
           </div>
           <div className="flex gap-2 items-center">
             <div className="flex gap-1">
-              <AiFillYoutube size={24} />
-              <AiFillInstagram size={24} />
-              <AiFillTikTok size={24} />
+              {item.sns.includes("youtube") && <AiFillYoutube size={24} />}
+              {item.sns.includes("instagram") && <AiFillInstagram size={24} />}
+              {item.sns.includes("tiktok") && <AiFillTikTok size={24} />}
             </div>
             <span className="text-sm text-primary-300">{getDDay(item.applicationEnd)}</span>
           </div>
         </div>
-        <div className="flex-1 bg-gray-200 aspect-square rounded-xl" />
+        {/* <div className="flex-1 bg-gray-200 aspect-square rounded-xl" /> */}
+        <img src={item.image} alt={item.title} className="w-1/2 aspect-square rounded-xl " />
       </section>
 
       <section className="text-sm py-3 mx-3 flex flex-col border-t-2 border-b-2 border-placeholder gap-3">
@@ -132,13 +135,13 @@ export default function CampaignDetailPage() {
       <section className="p-3">
         <h2 className="font-bold text-primary-300">MISSION</h2>
         <div className="space-y-2 py-2 mt-2 border-t-2 border-placeholder">
-          <div className="text-dark-blue flex items-center gap-1">
+          <div className="text-dark-blue flex gap-1">
             <MdOutlineCheck />
             <p className="text-sm font-semibold">
               Video Length : {item.videoMin}sec - {item.videoMax}sec
             </p>
           </div>
-          <div className="text-dark-blue flex items-center gap-1">
+          <div className="text-dark-blue flex gap-1">
             <MdOutlineCheck />
             <p className="text-sm">Get treatment at {item.brandName} and record the process</p>
           </div>
