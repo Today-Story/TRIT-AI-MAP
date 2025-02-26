@@ -149,14 +149,14 @@ export default function CampaignDetailPage() {
         </div>
       </section>
 
-      <section>
+      <footer className="pb-6 px-3">
         <button
-          className="w-full py-3 bg-primary-300 text-white font-semibold rounded-md text-sm mb-6"
+          className="w-full py-3 bg-primary-300 text-white font-semibold rounded-md text-sm"
           onClick={onRouteApply}
         >
           Apply
         </button>
-      </section>
+      </footer>
     </main>
   );
 }
