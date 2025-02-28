@@ -17,6 +17,12 @@ export class ContentDto {
     url: string;
 
     @Expose()
+    imageUrl: string;
+
+    @Expose()
+    videoUrl: string;
+
+    @Expose()
     createdAt: Date;
 
     @Expose()

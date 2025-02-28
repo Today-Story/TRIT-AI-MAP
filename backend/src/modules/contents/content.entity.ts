@@ -24,6 +24,12 @@ export class Content {
     @Column({ type: 'text'})
     url: string;
 
+    @Column({ type: 'text', nullable: true })
+    imageUrl: string;
+
+    @Column({ type: 'text', nullable: true })
+    videoUrl: string;
+
     @Column({ type: 'timestamptz' })
     createdAt: Date;
 

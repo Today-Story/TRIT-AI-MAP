@@ -137,6 +137,8 @@ export class CsvService {
             postNumber: postNumber,
             title: data['제목']?.trim() || '제목 없음',
             url: data['URL']?.trim() || '',
+            imageUrl: data['썸네일 이미지']?.trim() || null,
+            videoUrl: data['동영상']?.trim() || null,
             createdAt: data['작성시각'] ? new Date(data['작성시각']) : null,
             views: Number(data['조회수']) || 0,
             likes: Number(data['좋아요']) || 0,
